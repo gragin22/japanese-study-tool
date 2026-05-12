@@ -1,0 +1,2928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>読む・聞く — Japanese Study Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafaf7;
+    --surface: #ffffff;
+    --surface-2: #f3f1ec;
+    --ink: #1a1a1a;
+    --ink-soft: #4a4a4a;
+    --ink-mute: #8a8a8a;
+    --line: #e6e3dc;
+    --kanji: #1a1a1a;
+    --hiragana: #c93b3b;
+    --katakana: #2563c9;
+    --particle: #b67400;
+    --accent: #d4632a;
+    --hover: #faf3eb;
+    --selected: #fce8d6;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14130f;
+      --surface: #1c1b18;
+      --surface-2: #24221e;
+      --ink: #f0ece4;
+      --ink-soft: #c8c3b8;
+      --ink-mute: #7a7468;
+      --line: #2d2b26;
+      --kanji: #f0ece4;
+      --hiragana: #ff7373;
+      --katakana: #6aa8ff;
+      --particle: #e0a64a;
+      --accent: #ff8a3d;
+      --hover: #28241e;
+      --selected: #3a2f22;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .app {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 20px 200px;
+  }
+
+  /* Header */
+  header.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 24px;
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .brand .jp {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: .02em;
+  }
+  .brand .en {
+    font-size: 12px;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: .15em;
+  }
+  .top-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* Article picker */
+  .picker {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .picker label {
+    display: block;
+    font-size: 11px;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    margin-bottom: 8px;
+  }
+  .picker select {
+    width: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: 'Noto Sans JP', 'Inter', sans-serif;
+    font-size: 15px;
+  }
+
+  /* Audio bar */
+  .audio-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+  .play-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform .15s, background .15s;
+    flex-shrink: 0;
+  }
+  .play-btn:hover { transform: scale(1.05); }
+  .play-btn:active { transform: scale(.95); }
+  .play-btn svg { width: 22px; height: 22px; fill: white; }
+  .audio-meta {
+    flex: 1;
+    min-width: 0;
+  }
+  .audio-meta .title {
+    font-weight: 600;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .audio-meta .sub {
+    font-size: 12px;
+    color: var(--ink-mute);
+  }
+  .speed-control {
+    display: flex;
+    gap: 4px;
+    background: var(--surface-2);
+    border-radius: 999px;
+    padding: 3px;
+    flex-shrink: 0;
+  }
+  .speed-control button {
+    background: none;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .speed-control button.active {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+
+  /* Toggles */
+  .toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .toggle {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all .15s;
+    user-select: none;
+  }
+  .toggle.on {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+  .toggle:hover { border-color: var(--ink-soft); }
+
+  /* Article body */
+  .article {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    box-shadow: var(--shadow);
+  }
+  .article h2 {
+    margin: 0 0 20px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .article h2 .en-title {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--ink-mute);
+    letter-spacing: .04em;
+    margin-top: 6px;
+  }
+
+  .sentence {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 2px;
+    margin-bottom: 28px;
+    line-height: 1;
+  }
+
+  /* Word stack: romaji on top, kana middle, base char(s) bottom */
+  .word {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 4px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .12s;
+    min-width: 1em;
+  }
+  .word:hover { background: var(--hover); }
+  .word.selected { background: var(--selected); }
+  .word.speaking { background: var(--selected); }
+
+  .word .literal {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    margin-bottom: 3px;
+    line-height: 1.2;
+    white-space: nowrap;
+    letter-spacing: -.005em;
+  }
+  .word .literal.particle-role {
+    color: var(--particle);
+    font-style: italic;
+    font-weight: 400;
+  }
+  .word .romaji {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: .02em;
+    margin-bottom: 2px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .word .kana {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    color: var(--hiragana);
+    margin-bottom: 2px;
+    line-height: 1.2;
+    min-height: 1em;
+  }
+  .word .kana.empty { visibility: hidden; }
+  .word .base {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+  .word .base.kanji { color: var(--kanji); }
+  .word .base.hiragana { color: var(--hiragana); }
+  .word .base.katakana { color: var(--katakana); }
+  .word .base.particle { color: var(--particle); font-weight: 600; }
+
+  /* When furigana hidden, hide kana span */
+  body.no-furigana .word .kana { display: none; }
+  body.no-romaji .word .romaji { display: none; }
+  body.no-literal .word .literal { display: none; }
+  body.no-color .word .base { color: var(--ink) !important; }
+
+  .punct {
+    align-self: flex-end;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 28px;
+    color: var(--ink-mute);
+    padding-bottom: 8px;
+  }
+
+  .sentence-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    margin-top: -12px;
+  }
+  .sentence-play {
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 4px 10px 4px 8px;
+    font-size: 11px;
+    color: var(--ink-mute);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all .15s;
+  }
+  .sentence-play:hover { border-color: var(--accent); color: var(--accent); }
+  .sentence-play svg { width: 10px; height: 10px; }
+
+  .gloss {
+    font-size: 13px;
+    color: var(--ink-mute);
+    font-style: italic;
+    padding: 0 4px;
+    margin-bottom: 8px;
+  }
+
+  /* Detail panel */
+  .detail {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -8px 32px rgba(0,0,0,.12);
+    transform: translateY(100%);
+    transition: transform .25s cubic-bezier(.2,.8,.2,1);
+    z-index: 50;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  .detail.open { transform: translateY(0); }
+  .detail-inner {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 24px 32px;
+  }
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+  }
+  .detail-tag {
+    display: inline-block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--surface-2);
+    color: var(--ink-mute);
+    margin-bottom: 8px;
+  }
+  .detail-close {
+    background: none;
+    border: none;
+    color: var(--ink-mute);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+  }
+
+  .detail-word {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 8px;
+  }
+  .detail-word .literal-big {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -.005em;
+    margin-bottom: 2px;
+  }
+  .detail-word .literal-big.particle-role {
+    color: var(--particle);
+    font-style: italic;
+    font-weight: 500;
+  }
+  .detail-word .romaji-big {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    color: var(--ink-soft);
+    letter-spacing: .03em;
+  }
+  .detail-word .kana-big {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 24px;
+    color: var(--hiragana);
+  }
+  .detail-word .kana-big.empty { display: none; }
+  .detail-word .base-big {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 64px;
+    line-height: 1.1;
+    font-weight: 500;
+  }
+  .detail-word .base-big.kanji { color: var(--kanji); }
+  .detail-word .base-big.hiragana { color: var(--hiragana); }
+  .detail-word .base-big.katakana { color: var(--katakana); }
+  .detail-word .base-big.particle { color: var(--particle); font-weight: 600; }
+
+  .detail-meta {
+    margin-top: 4px;
+  }
+  .detail-meaning {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .detail-pos {
+    font-size: 12px;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+
+  /* Character-level breakdown table inside detail */
+  .char-breakdown {
+    margin-top: 24px;
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+  }
+  .char-breakdown h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--ink-mute);
+    margin: 0 0 12px;
+    font-weight: 600;
+  }
+  .char-row {
+    display: grid;
+    grid-template-columns: 56px 80px 1fr;
+    gap: 16px;
+    align-items: center;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  .char-row:last-child { border-bottom: none; }
+  .char-row .ch {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 32px;
+    text-align: center;
+  }
+  .char-row .ch.kanji { color: var(--kanji); }
+  .char-row .ch.hiragana { color: var(--hiragana); }
+  .char-row .ch.katakana { color: var(--katakana); }
+  .char-row .sound {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .char-row .role {
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .detail-play {
+    margin-top: 16px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 20px;
+    padding: 12px 16px;
+    background: var(--surface-2);
+    border-radius: 10px;
+    font-size: 11px;
+    color: var(--ink-mute);
+  }
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  /* Mobile */
+  @media (max-width: 540px) {
+    .app { padding: 16px 14px 200px; }
+    .article { padding: 22px 18px; }
+    .article h2 { font-size: 19px; }
+    .word .base { font-size: 24px; }
+    .word .literal { font-size: 11px; }
+    .word .romaji { font-size: 10px; }
+    .word .kana { font-size: 11px; }
+    .audio-bar { padding: 12px; gap: 10px; }
+    .play-btn { width: 42px; height: 42px; }
+    .detail-word .base-big { font-size: 48px; }
+    .detail-word .literal-big { font-size: 14px; }
+  }
+
+  .footnote {
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-mute);
+    margin-top: 32px;
+    letter-spacing: .04em;
+  }
+
+  /* Mode toggle */
+  .mode-toggle {
+    display: flex;
+    background: var(--surface-2);
+    border-radius: 999px;
+    padding: 4px;
+    margin: 0 auto 20px;
+    width: fit-content;
+  }
+  .mode-toggle button {
+    background: none;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+  }
+  .mode-toggle button.active {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+
+  /* View switcher */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* Scenario picker */
+  .scenario-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .scenario-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 14px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    transition: all .15s;
+  }
+  .scenario-card:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: var(--shadow); }
+  .scenario-card.active { border-color: var(--accent); background: var(--hover); }
+  .scenario-card .emoji {
+    font-size: 26px;
+    margin-bottom: 8px;
+    display: block;
+    line-height: 1;
+  }
+  .scenario-card .name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+  .scenario-card .name-jp {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    color: var(--ink-mute);
+  }
+
+  .scenario-setting {
+    background: var(--surface-2);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-style: italic;
+    border-left: 3px solid var(--accent);
+  }
+
+  /* Dialogue */
+  .dialogue {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .bubble {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px 18px;
+    max-width: 92%;
+    box-shadow: var(--shadow);
+    animation: slideIn .25s ease-out;
+    position: relative;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .bubble.you {
+    align-self: flex-end;
+    background: var(--hover);
+    border-color: var(--selected);
+  }
+  .bubble.host { align-self: flex-start; }
+  .bubble-speaker {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--ink-mute);
+    margin-bottom: 12px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .bubble.you .bubble-speaker { color: var(--accent); }
+  .bubble .sentence { margin-bottom: 6px; }
+  .bubble .gloss {
+    font-size: 13px;
+    color: var(--ink-mute);
+    font-style: italic;
+    margin-top: 4px;
+    padding: 0 2px;
+  }
+
+  /* Choice cards */
+  .choices-wrap {
+    margin-top: 8px;
+    padding-top: 4px;
+  }
+  .choices-header {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--ink-mute);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .choice {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 18px;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    color: inherit;
+    transition: all .15s;
+    box-shadow: var(--shadow);
+  }
+  .choice:hover {
+    border-color: var(--accent);
+    background: var(--hover);
+    transform: translateX(3px);
+  }
+  .choice .choice-en {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .choice .choice-jp {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 17px;
+    color: var(--ink-soft);
+  }
+
+  /* End of scenario */
+  .scenario-end {
+    text-align: center;
+    padding: 24px 20px;
+    background: var(--surface-2);
+    border-radius: 14px;
+    color: var(--ink-soft);
+    font-size: 14px;
+    margin-top: 12px;
+  }
+  .scenario-end .end-jp {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 18px;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .scenario-end button {
+    margin-top: 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 22px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .scenario-end button:hover { transform: translateY(-1px); }
+
+  @media (max-width: 540px) {
+    .bubble { max-width: 100%; padding: 14px; }
+    .scenario-cards { grid-template-columns: repeat(2, 1fr); }
+    .scenario-card { padding: 12px 10px; }
+    .scenario-card .emoji { font-size: 22px; }
+    .scenario-card .name { font-size: 13px; }
+  }
+
+  /* ===== Kana chart ===== */
+  .kana-intro {
+    background: var(--surface-2);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    border-left: 3px solid var(--accent);
+  }
+  .kana-group { margin-bottom: 32px; }
+  .kana-group h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: var(--ink-soft);
+    margin: 0 0 4px;
+    font-weight: 700;
+  }
+  .kana-group-sub {
+    font-size: 12px;
+    color: var(--ink-mute);
+    margin: 0 0 14px;
+  }
+  .kana-grid {
+    display: grid;
+    grid-template-columns: 56px repeat(5, 1fr);
+    gap: 6px;
+  }
+  .kana-grid.youon { grid-template-columns: 56px repeat(3, 1fr); }
+  .kana-row-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-mute);
+    background: var(--surface-2);
+    border-radius: 8px;
+    font-weight: 600;
+  }
+  .kana-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 6px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .15s;
+    font-family: inherit;
+    color: inherit;
+  }
+  .kana-cell:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  }
+  .kana-cell:active { transform: translateY(0); }
+  .kana-cell.empty { visibility: hidden; }
+  .kana-cell .h {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 26px;
+    color: var(--hiragana);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .kana-cell .k {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 16px;
+    color: var(--katakana);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .kana-cell .r {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: .02em;
+  }
+  .kana-cell .mn {
+    font-family: 'Inter', sans-serif;
+    font-size: 9.5px;
+    line-height: 1.3;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-top: 5px;
+    text-align: center;
+    padding: 0 2px;
+    opacity: .8;
+  }
+  @media (max-width: 540px) {
+    .kana-cell .mn { font-size: 8.5px; margin-top: 3px; }
+  }
+
+  @media (max-width: 540px) {
+    .kana-grid { grid-template-columns: 38px repeat(5, 1fr); gap: 4px; }
+    .kana-grid.youon { grid-template-columns: 38px repeat(3, 1fr); }
+    .kana-cell { padding: 8px 2px; }
+    .kana-cell .h { font-size: 20px; }
+    .kana-cell .k { font-size: 13px; }
+    .kana-cell .r { font-size: 10px; }
+  }
+
+  /* ===== Drill mode ===== */
+  .drill-settings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+    justify-content: center;
+  }
+  .drill-pill {
+    display: inline-flex;
+    background: var(--surface-2);
+    border-radius: 999px;
+    padding: 3px;
+  }
+  .drill-pill button {
+    background: none;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: .01em;
+  }
+  .drill-pill button.active {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    font-weight: 600;
+  }
+
+  .drill-stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-mute);
+    letter-spacing: .04em;
+  }
+  .drill-stat strong {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 22px;
+    color: var(--ink);
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .drill-stat .label {
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: .12em;
+  }
+
+  .drill-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 56px 24px;
+    margin: 0 auto 24px;
+    max-width: 420px;
+    text-align: center;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 120px;
+    line-height: 1;
+    color: var(--ink);
+    box-shadow: var(--shadow);
+    transition: background .3s, border-color .3s;
+    user-select: none;
+  }
+  .drill-card.hiragana { color: var(--hiragana); }
+  .drill-card.katakana { color: var(--katakana); }
+  .drill-card.flash-correct {
+    background: rgba(64, 180, 96, 0.12);
+    border-color: rgb(64, 180, 96);
+  }
+  .drill-card.flash-wrong {
+    background: rgba(220, 60, 60, 0.10);
+    border-color: rgb(220, 60, 60);
+  }
+
+  .drill-choices {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .drill-choice {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all .15s;
+    box-shadow: var(--shadow);
+    font-weight: 500;
+  }
+  .drill-choice:hover:not(:disabled) {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .drill-choice.correct {
+    background: rgb(64, 180, 96);
+    color: white;
+    border-color: rgb(64, 180, 96);
+  }
+  .drill-choice.wrong {
+    background: rgb(220, 60, 60);
+    color: white;
+    border-color: rgb(220, 60, 60);
+  }
+  .drill-choice:disabled { cursor: default; }
+
+  .drill-restart {
+    margin: 24px auto 0;
+    display: block;
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-family: inherit;
+    font-size: 12px;
+    color: var(--ink-mute);
+    cursor: pointer;
+  }
+  .drill-restart:hover { color: var(--accent); border-color: var(--accent); }
+
+  .drill-recap {
+    background: var(--surface-2);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--ink-mute);
+    text-align: center;
+  }
+  .drill-recap .miss-list {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .drill-recap .miss-chip {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 16px;
+    color: var(--ink);
+  }
+
+  @media (max-width: 540px) {
+    .drill-card { padding: 40px 16px; font-size: 96px; }
+    .drill-choices { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .drill-choice { padding: 16px 8px; font-size: 18px; }
+    .drill-stats { gap: 16px; }
+    .drill-stat strong { font-size: 18px; }
+  }
+
+  /* ===== Alt reading hint under char breakdown rows ===== */
+  .char-alt {
+    padding: 6px 4px 14px 76px;
+    margin-top: -8px;
+    border-bottom: 1px solid var(--line);
+    font-size: 11.5px;
+    color: var(--ink-mute);
+    line-height: 1.5;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .char-alt:last-child { border-bottom: none; }
+  .char-alt-icon { flex-shrink: 0; font-size: 13px; }
+  .char-alt-body strong {
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .char-alt-examples {
+    display: block;
+    color: var(--ink-mute);
+    margin-top: 3px;
+    font-style: italic;
+  }
+  @media (max-width: 540px) {
+    .char-alt { padding-left: 56px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <div class="brand">
+      <span class="jp">読む・聞く</span>
+      <span class="en">read · listen</span>
+    </div>
+    <div class="top-controls"></div>
+  </header>
+
+  <div class="mode-toggle" id="mode-toggle">
+    <button class="active" data-mode="article">📰 Articles</button>
+    <button data-mode="conversation">💬 Conversations</button>
+    <button data-mode="kana">📖 Kana Chart</button>
+    <button data-mode="drill">🎴 Drill</button>
+  </div>
+
+  <div class="toggles">
+    <span class="toggle on" data-toggle="literal">word meaning</span>
+    <span class="toggle on" data-toggle="romaji">romaji</span>
+    <span class="toggle on" data-toggle="furigana">furigana</span>
+    <span class="toggle on" data-toggle="color">color coding</span>
+  </div>
+
+  <!-- ========== ARTICLE VIEW ========== -->
+  <div class="view active" id="view-article">
+    <div class="picker">
+      <label for="article-select">Article</label>
+      <select id="article-select"></select>
+    </div>
+
+    <div class="audio-bar">
+      <button class="play-btn" id="play-all" aria-label="Play article">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <div class="audio-meta">
+        <div class="title" id="audio-title">—</div>
+        <div class="sub" id="audio-sub">tap any word to break it down</div>
+      </div>
+      <div class="speed-control" id="speed-control">
+        <button data-rate="0.7">0.7x</button>
+        <button data-rate="0.85" class="active">0.85x</button>
+        <button data-rate="1.0">1.0x</button>
+      </div>
+    </div>
+
+    <div class="article" id="article-body"></div>
+  </div>
+
+  <!-- ========== CONVERSATION VIEW ========== -->
+  <div class="view" id="view-conversation">
+    <div class="scenario-cards" id="scenario-cards"></div>
+    <div id="scenario-detail" style="display:none;">
+      <div class="scenario-setting" id="scenario-setting"></div>
+      <div class="dialogue" id="dialogue"></div>
+    </div>
+  </div>
+
+  <!-- ========== KANA CHART VIEW ========== -->
+  <div class="view" id="view-kana">
+    <div class="kana-intro">
+      Every Japanese word ever spoken is a sequence of these ~107 sounds. Tap any cell to hear it. Hiragana on top (red), katakana below (blue), romaji at the bottom.
+    </div>
+    <div id="kana-chart"></div>
+  </div>
+
+  <!-- ========== DRILL VIEW ========== -->
+  <div class="view" id="view-drill">
+    <div class="drill-settings">
+      <div class="drill-pill" data-group="script">
+        <button class="active" data-script="hiragana">hiragana</button>
+        <button data-script="katakana">katakana</button>
+        <button data-script="both">both</button>
+      </div>
+      <div class="drill-pill" data-group="level">
+        <button class="active" data-level="basic">basic 46</button>
+        <button data-level="voiced">+ voiced</button>
+        <button data-level="all">all</button>
+      </div>
+    </div>
+
+    <div class="drill-stats">
+      <div class="drill-stat"><div class="label">score</div><strong id="drill-score">0/0</strong></div>
+      <div class="drill-stat"><div class="label">accuracy</div><strong id="drill-acc">—</strong></div>
+      <div class="drill-stat"><div class="label">streak</div><strong id="drill-streak">0</strong></div>
+      <div class="drill-stat"><div class="label">best</div><strong id="drill-best">0</strong></div>
+    </div>
+
+    <div class="drill-card" id="drill-card">—</div>
+    <div class="drill-choices" id="drill-choices"></div>
+    <button class="drill-restart" id="drill-restart">↻ Reset session</button>
+    <div class="drill-recap" id="drill-recap" style="display:none;"></div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:var(--kanji)"></span>Kanji (meaning)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--hiragana)"></span>Hiragana (native sounds)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--katakana)"></span>Katakana (foreign words)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--particle)"></span>Particles (sentence roles)</div>
+  </div>
+
+  <div class="footnote">step 1 demo · audio via Web Speech API · NHK proxy coming in step 2</div>
+</div>
+
+<div class="detail" id="detail">
+  <div class="detail-inner">
+    <div class="detail-header">
+      <div>
+        <div class="detail-tag" id="detail-tag">word</div>
+      </div>
+      <button class="detail-close" id="detail-close" aria-label="Close">×</button>
+    </div>
+    <div class="detail-word" id="detail-word"></div>
+    <div class="detail-meta">
+      <div class="detail-meaning" id="detail-meaning"></div>
+      <div class="detail-pos" id="detail-pos"></div>
+    </div>
+    <button class="detail-play" id="detail-play">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="white"><path d="M8 5v14l11-7z"/></svg>
+      Hear it
+    </button>
+    <div class="char-breakdown" id="char-breakdown"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   SAMPLE ARTICLES
+   Each token has: base, kana (reading in hiragana, optional),
+   romaji, script type, meaning, part of speech, optional chars[]
+   for character-level breakdown.
+   ============================================================ */
+const ARTICLES = [
+  {
+    id: "sample-1",
+    title: "東京でゲームの大会がありました",
+    titleEn: "There was a game tournament in Tokyo",
+    sentences: [
+      {
+        gloss: "Today, in Tokyo, there was a video game tournament.",
+        tokens: [
+          { base:"きょう", kana:"", romaji:"kyou", literal:"today", script:"hiragana", meaning:"today", pos:"noun",
+            chars:[{c:"き",s:"ki",r:"sound"},{c:"ょ",s:"yo",r:"small ‘ya’ blends with き → kyo"},{c:"う",s:"u",r:"long vowel mark"}] },
+          { punct:"、" },
+          { base:"東京", kana:"とうきょう", romaji:"toukyou", literal:"Tokyo", script:"kanji", meaning:"Tokyo", pos:"place name",
+            chars:[
+              {c:"東",s:"tou",r:"‘east’ — capital of the east"},
+              {c:"京",s:"kyou",r:"‘capital city’"},
+              {c:"と",s:"to",r:"reading of 東"},
+              {c:"う",s:"u",r:"long vowel on とう"},
+              {c:"き",s:"ki",r:"reading of 京"},
+              {c:"ょ",s:"yo",r:"small ya → kyo"},
+              {c:"う",s:"u",r:"long vowel on きょう"}
+            ] },
+          { base:"で", kana:"", romaji:"de", literal:"in", literalRole:"particle", script:"particle", meaning:"at / in (location of action)", pos:"particle",
+            chars:[{c:"で",s:"de",r:"location-of-action particle"}] },
+          { base:"ゲーム", kana:"", romaji:"geemu", literal:"game", script:"katakana", meaning:"game (video game)", pos:"noun",
+            chars:[
+              {c:"ゲ",s:"ge",r:"sound"},
+              {c:"ー",s:"—",r:"long-vowel mark (extends previous vowel)"},
+              {c:"ム",s:"mu",r:"sound"}
+            ] },
+          { base:"の", kana:"", romaji:"no", literal:"of", literalRole:"particle", script:"particle", meaning:"’s / of (possessive)", pos:"particle",
+            chars:[{c:"の",s:"no",r:"linking particle"}] },
+          { base:"大会", kana:"たいかい", romaji:"taikai", literal:"tournament", script:"kanji", meaning:"tournament, big meeting", pos:"noun",
+            chars:[
+              {c:"大",s:"tai",r:"‘big’"},
+              {c:"会",s:"kai",r:"‘meeting / gathering’"},
+              {c:"た",s:"ta",r:"reading of 大"},
+              {c:"い",s:"i",r:"long sound"},
+              {c:"か",s:"ka",r:"reading of 会"},
+              {c:"い",s:"i",r:"long sound"}
+            ] },
+          { base:"が", kana:"", romaji:"ga", literal:"[subj]", literalRole:"particle", script:"particle", meaning:"subject marker", pos:"particle",
+            chars:[{c:"が",s:"ga",r:"marks the subject"}] },
+          { base:"ありました", kana:"", romaji:"arimashita", literal:"there-was", script:"hiragana", meaning:"there was / existed (polite past)", pos:"verb",
+            chars:[
+              {c:"あ",s:"a",r:"verb root"},
+              {c:"り",s:"ri",r:"verb stem ending"},
+              {c:"ま",s:"ma",r:"polite suffix"},
+              {c:"し",s:"shi",r:"past form"},
+              {c:"た",s:"ta",r:"past ending"}
+            ] },
+          { punct:"。" }
+        ]
+      },
+      {
+        gloss: "Many people came and watched.",
+        tokens: [
+          { base:"たくさん", kana:"", romaji:"takusan", literal:"many", script:"hiragana", meaning:"a lot, many", pos:"adverb",
+            chars:[{c:"た",s:"ta",r:""},{c:"く",s:"ku",r:""},{c:"さ",s:"sa",r:""},{c:"ん",s:"n",r:"nasal ending"}] },
+          { base:"の", kana:"", romaji:"no", literal:"of", literalRole:"particle", script:"particle", meaning:"of / linking", pos:"particle",
+            chars:[{c:"の",s:"no",r:""}] },
+          { base:"人", kana:"ひと", romaji:"hito", literal:"people", script:"kanji", meaning:"person, people", pos:"noun",
+            chars:[
+              {c:"人",s:"hito",r:"‘person’"},
+              {c:"ひ",s:"hi",r:"reading"},
+              {c:"と",s:"to",r:"reading"}
+            ] },
+          { base:"が", kana:"", romaji:"ga", literal:"[subj]", literalRole:"particle", script:"particle", meaning:"subject marker", pos:"particle",
+            chars:[{c:"が",s:"ga",r:""}] },
+          { base:"来て", kana:"きて", romaji:"kite", literal:"came-and", script:"kanji", meaning:"came (and)", pos:"verb",
+            chars:[
+              {c:"来",s:"ki",r:"‘to come’"},
+              {c:"て",s:"te",r:"connector — joins to next verb"}
+            ] },
+          { punct:"、" },
+          { base:"見ました", kana:"みました", romaji:"mimashita", literal:"watched", script:"kanji", meaning:"watched (polite past)", pos:"verb",
+            chars:[
+              {c:"見",s:"mi",r:"‘to see / watch’"},
+              {c:"ま",s:"ma",r:"polite"},
+              {c:"し",s:"shi",r:"past"},
+              {c:"た",s:"ta",r:"past ending"}
+            ] },
+          { punct:"。" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "sample-2",
+    title: "今日はいい天気ですね",
+    titleEn: "Nice weather today, isn’t it?",
+    sentences: [
+      {
+        gloss: "Today the weather is nice, isn’t it?",
+        tokens: [
+          { base:"今日", kana:"きょう", romaji:"kyou", literal:"today", script:"kanji", meaning:"today", pos:"noun",
+            chars:[
+              {c:"今",s:"kyo",r:"‘now’"},
+              {c:"日",s:"u",r:"‘day’ — irregular reading together"},
+              {c:"き",s:"ki",r:""},{c:"ょ",s:"yo",r:""},{c:"う",s:"u",r:""}
+            ] },
+          { base:"は", kana:"", romaji:"wa", literal:"[topic]", literalRole:"particle", script:"particle", meaning:"topic marker (read as ‘wa’)", pos:"particle",
+            chars:[{c:"は",s:"wa",r:"topic marker — written ha, read wa"}] },
+          { base:"いい", kana:"", romaji:"ii", literal:"good", script:"hiragana", meaning:"good", pos:"adjective",
+            chars:[{c:"い",s:"i",r:""},{c:"い",s:"i",r:"doubled for long vowel"}] },
+          { base:"天気", kana:"てんき", romaji:"tenki", literal:"weather", script:"kanji", meaning:"weather", pos:"noun",
+            chars:[
+              {c:"天",s:"ten",r:"‘heaven / sky’"},
+              {c:"気",s:"ki",r:"‘feeling / spirit’"},
+              {c:"て",s:"te",r:""},{c:"ん",s:"n",r:""},{c:"き",s:"ki",r:""}
+            ] },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is / am / are (polite)", pos:"copula",
+            chars:[{c:"で",s:"de",r:""},{c:"す",s:"su",r:""}] },
+          { base:"ね", kana:"", romaji:"ne", literal:"right?", literalRole:"particle", script:"particle", meaning:"isn’t it? (seeking agreement)", pos:"particle",
+            chars:[{c:"ね",s:"ne",r:"agreement-seeking particle"}] },
+          { punct:"。" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "sample-3",
+    title: "コーヒーを飲みます",
+    titleEn: "I drink coffee",
+    sentences: [
+      {
+        gloss: "I drink coffee.",
+        tokens: [
+          { base:"私", kana:"わたし", romaji:"watashi", literal:"I", script:"kanji", meaning:"I, me", pos:"pronoun",
+            chars:[
+              {c:"私",s:"watashi",r:"‘I / private’"},
+              {c:"わ",s:"wa",r:""},{c:"た",s:"ta",r:""},{c:"し",s:"shi",r:""}
+            ] },
+          { base:"は", kana:"", romaji:"wa", literal:"[topic]", literalRole:"particle", script:"particle", meaning:"topic marker", pos:"particle",
+            chars:[{c:"は",s:"wa",r:"topic marker"}] },
+          { base:"コーヒー", kana:"", romaji:"koohii", literal:"coffee", script:"katakana", meaning:"coffee (foreign word)", pos:"noun",
+            chars:[
+              {c:"コ",s:"ko",r:""},
+              {c:"ー",s:"—",r:"long vowel"},
+              {c:"ヒ",s:"hi",r:""},
+              {c:"ー",s:"—",r:"long vowel"}
+            ] },
+          { base:"を", kana:"", romaji:"o", literal:"[obj]", literalRole:"particle", script:"particle", meaning:"direct object marker", pos:"particle",
+            chars:[{c:"を",s:"o",r:"object marker — written wo, read o"}] },
+          { base:"飲みます", kana:"のみます", romaji:"nomimasu", literal:"drink", script:"kanji", meaning:"drink (polite)", pos:"verb",
+            chars:[
+              {c:"飲",s:"no",r:"‘to drink’"},
+              {c:"み",s:"mi",r:"verb stem ending"},
+              {c:"ま",s:"ma",r:"polite"},
+              {c:"す",s:"su",r:"non-past polite ending"}
+            ] },
+          { punct:"。" }
+        ]
+      }
+    ]
+  }
+];
+
+/* ============================================================
+   SCENARIOS — choose-your-own-adventure travel dialogues
+   Each node = one spoken line. Nodes either auto-advance (next)
+   or wait for player to pick from `choices`.
+   ============================================================ */
+const SCENARIOS = [
+  /* ---------- 1. RESTAURANT ---------- */
+  {
+    id:"restaurant", emoji:"🍣", name:"At a Restaurant", nameJp:"レストランで",
+    setting:"You walk into a small izakaya in Tokyo for dinner. The host greets you at the door.",
+    start:"r1",
+    nodes:{
+      "r1":{ speaker:"host", gloss:"Welcome! How many in your party?",
+        tokens:[
+          { base:"いらっしゃいませ", kana:"", romaji:"irasshaimase", literal:"welcome", script:"hiragana", meaning:"welcome (formal greeting to customers)", pos:"set phrase" },
+          { punct:"！" },
+          { base:"何名様", kana:"なんめいさま", romaji:"nanmeisama", literal:"how-many-people", script:"kanji", meaning:"how many people (polite)", pos:"noun" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is (polite copula)", pos:"copula" },
+          { base:"か", kana:"", romaji:"ka", literal:"?", literalRole:"particle", script:"particle", meaning:"question marker", pos:"particle" },
+          { punct:"？" }
+        ],
+        choices:[
+          { gloss:"Two people.", next:"r2",
+            tokens:[
+              { base:"二人", kana:"ふたり", romaji:"futari", literal:"two-people", script:"kanji", meaning:"two people", pos:"noun" },
+              { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+              { punct:"。" }
+            ] },
+          { gloss:"Just me.", next:"r2",
+            tokens:[
+              { base:"一人", kana:"ひとり", romaji:"hitori", literal:"one-person", script:"kanji", meaning:"one person", pos:"noun" },
+              { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+              { punct:"。" }
+            ] },
+          { gloss:"Four of us.", next:"r2",
+            tokens:[
+              { base:"四人", kana:"よにん", romaji:"yonin", literal:"four-people", script:"kanji", meaning:"four people", pos:"noun" },
+              { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+              { punct:"。" }
+            ] }
+        ] },
+      "r2":{ speaker:"host", gloss:"Right this way please.",
+        tokens:[
+          { base:"こちら", kana:"", romaji:"kochira", literal:"this-way", script:"hiragana", meaning:"this way (polite)", pos:"pronoun" },
+          { base:"へ", kana:"", romaji:"e", literal:"to", literalRole:"particle", script:"particle", meaning:"direction particle (written ha, read e)", pos:"particle" },
+          { base:"どうぞ", kana:"", romaji:"douzo", literal:"please", script:"hiragana", meaning:"please (go ahead)", pos:"adverb" },
+          { punct:"。" }
+        ],
+        next:"r3" },
+      "r3":{ speaker:"host", gloss:"What would you like to drink?",
+        tokens:[
+          { base:"お飲み物", kana:"おのみもの", romaji:"onomimono", literal:"drink", script:"kanji", meaning:"drink (polite)", pos:"noun" },
+          { base:"は", kana:"", romaji:"wa", literal:"[topic]", literalRole:"particle", script:"particle", meaning:"topic marker", pos:"particle" },
+          { base:"何", kana:"なに", romaji:"nani", literal:"what", script:"kanji", meaning:"what", pos:"pronoun" },
+          { base:"に", kana:"", romaji:"ni", literal:"to", literalRole:"particle", script:"particle", meaning:"to (particle)", pos:"particle" },
+          { base:"します", kana:"", romaji:"shimasu", literal:"do", script:"hiragana", meaning:"do (polite)", pos:"verb" },
+          { base:"か", kana:"", romaji:"ka", literal:"?", literalRole:"particle", script:"particle", meaning:"question marker", pos:"particle" },
+          { punct:"？" }
+        ],
+        choices:[
+          { gloss:"A beer, please.", next:"r4",
+            tokens:[
+              { base:"ビール", kana:"", romaji:"biiru", literal:"beer", script:"katakana", meaning:"beer (foreign loanword)", pos:"noun" },
+              { base:"を", kana:"", romaji:"o", literal:"[obj]", literalRole:"particle", script:"particle", meaning:"direct object marker", pos:"particle" },
+              { base:"お願いします", kana:"おねがいします", romaji:"onegaishimasu", literal:"please", script:"kanji", meaning:"please (lit. ‘I make a request’)", pos:"set phrase" },
+              { punct:"。" }
+            ] },
+          { gloss:"Water is fine.", next:"r4",
+            tokens:[
+              { base:"水", kana:"みず", romaji:"mizu", literal:"water", script:"kanji", meaning:"water", pos:"noun" },
+              { base:"で", kana:"", romaji:"de", literal:"with", literalRole:"particle", script:"particle", meaning:"with / by means of", pos:"particle" },
+              { base:"いい", kana:"", romaji:"ii", literal:"good", script:"hiragana", meaning:"good / fine", pos:"adjective" },
+              { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+              { punct:"。" }
+            ] },
+          { gloss:"Green tea, please.", next:"r4",
+            tokens:[
+              { base:"お茶", kana:"おちゃ", romaji:"ocha", literal:"tea", script:"kanji", meaning:"green tea (polite)", pos:"noun" },
+              { base:"を", kana:"", romaji:"o", literal:"[obj]", literalRole:"particle", script:"particle", meaning:"object marker", pos:"particle" },
+              { base:"ください", kana:"", romaji:"kudasai", literal:"please-give", script:"hiragana", meaning:"please give me", pos:"verb" },
+              { punct:"。" }
+            ] }
+        ] },
+      "r4":{ speaker:"host", gloss:"Certainly. One moment please.",
+        tokens:[
+          { base:"かしこまりました", kana:"", romaji:"kashikomarimashita", literal:"certainly", script:"hiragana", meaning:"certainly (very formal)", pos:"set phrase" },
+          { punct:"。" },
+          { base:"少々", kana:"しょうしょう", romaji:"shoushou", literal:"a-moment", script:"kanji", meaning:"a little / a moment", pos:"adverb" },
+          { base:"お待ちください", kana:"おまちください", romaji:"omachikudasai", literal:"please-wait", script:"kanji", meaning:"please wait (polite)", pos:"verb" },
+          { punct:"。" }
+        ],
+        end:"Your drink arrives. 🍺 ごちそうさま!" }
+    }
+  },
+
+  /* ---------- 2. TRAIN STATION ---------- */
+  {
+    id:"train", emoji:"🚉", name:"Train Ticket", nameJp:"駅で",
+    setting:"You step up to the ticket counter at Tokyo Station. The clerk smiles.",
+    start:"t1",
+    nodes:{
+      "t1":{ speaker:"host", gloss:"Welcome. Where to?",
+        tokens:[
+          { base:"いらっしゃいませ", kana:"", romaji:"irasshaimase", literal:"welcome", script:"hiragana", meaning:"welcome", pos:"set phrase" },
+          { punct:"。" },
+          { base:"どちら", kana:"", romaji:"dochira", literal:"where", script:"hiragana", meaning:"where (polite)", pos:"pronoun" },
+          { base:"まで", kana:"", romaji:"made", literal:"to", literalRole:"particle", script:"particle", meaning:"until / to (destination)", pos:"particle" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+          { base:"か", kana:"", romaji:"ka", literal:"?", literalRole:"particle", script:"particle", meaning:"question marker", pos:"particle" },
+          { punct:"？" }
+        ],
+        choices:[
+          { gloss:"To Kyoto, please.", next:"t2",
+            tokens:[
+              { base:"京都", kana:"きょうと", romaji:"kyouto", literal:"Kyoto", script:"kanji", meaning:"Kyoto", pos:"place name" },
+              { base:"まで", kana:"", romaji:"made", literal:"to", literalRole:"particle", script:"particle", meaning:"to", pos:"particle" },
+              { base:"お願いします", kana:"おねがいします", romaji:"onegaishimasu", literal:"please", script:"kanji", meaning:"please", pos:"set phrase" },
+              { punct:"。" }
+            ] },
+          { gloss:"To Osaka, please.", next:"t2",
+            tokens:[
+              { base:"大阪", kana:"おおさか", romaji:"oosaka", literal:"Osaka", script:"kanji", meaning:"Osaka", pos:"place name" },
+              { base:"まで", kana:"", romaji:"made", literal:"to", literalRole:"particle", script:"particle", meaning:"to", pos:"particle" },
+              { base:"お願いします", kana:"おねがいします", romaji:"onegaishimasu", literal:"please", script:"kanji", meaning:"please", pos:"set phrase" },
+              { punct:"。" }
+            ] },
+          { gloss:"To Shinjuku.", next:"t2",
+            tokens:[
+              { base:"新宿", kana:"しんじゅく", romaji:"shinjuku", literal:"Shinjuku", script:"kanji", meaning:"Shinjuku", pos:"place name" },
+              { base:"まで", kana:"", romaji:"made", literal:"to", literalRole:"particle", script:"particle", meaning:"to", pos:"particle" },
+              { punct:"。" }
+            ] }
+        ] },
+      "t2":{ speaker:"host", gloss:"One-way, or round-trip?",
+        tokens:[
+          { base:"片道", kana:"かたみち", romaji:"katamichi", literal:"one-way", script:"kanji", meaning:"one-way", pos:"noun" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+          { base:"か", kana:"", romaji:"ka", literal:"?", literalRole:"particle", script:"particle", meaning:"question marker", pos:"particle" },
+          { punct:"、" },
+          { base:"往復", kana:"おうふく", romaji:"oufuku", literal:"round-trip", script:"kanji", meaning:"round-trip", pos:"noun" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+          { base:"か", kana:"", romaji:"ka", literal:"?", literalRole:"particle", script:"particle", meaning:"question marker", pos:"particle" },
+          { punct:"？" }
+        ],
+        choices:[
+          { gloss:"One-way please.", next:"t3",
+            tokens:[
+              { base:"片道", kana:"かたみち", romaji:"katamichi", literal:"one-way", script:"kanji", meaning:"one-way", pos:"noun" },
+              { base:"で", kana:"", romaji:"de", literal:"for", literalRole:"particle", script:"particle", meaning:"with / for", pos:"particle" },
+              { base:"お願いします", kana:"おねがいします", romaji:"onegaishimasu", literal:"please", script:"kanji", meaning:"please", pos:"set phrase" },
+              { punct:"。" }
+            ] },
+          { gloss:"Round-trip please.", next:"t3",
+            tokens:[
+              { base:"往復", kana:"おうふく", romaji:"oufuku", literal:"round-trip", script:"kanji", meaning:"round-trip", pos:"noun" },
+              { base:"で", kana:"", romaji:"de", literal:"for", literalRole:"particle", script:"particle", meaning:"with / for", pos:"particle" },
+              { base:"お願いします", kana:"おねがいします", romaji:"onegaishimasu", literal:"please", script:"kanji", meaning:"please", pos:"set phrase" },
+              { punct:"。" }
+            ] }
+        ] },
+      "t3":{ speaker:"host", gloss:"Next bullet train is at 3 o’clock. Is that all right?",
+        tokens:[
+          { base:"次", kana:"つぎ", romaji:"tsugi", literal:"next", script:"kanji", meaning:"next", pos:"noun" },
+          { base:"の", kana:"", romaji:"no", literal:"of", literalRole:"particle", script:"particle", meaning:"of (linking)", pos:"particle" },
+          { base:"新幹線", kana:"しんかんせん", romaji:"shinkansen", literal:"bullet-train", script:"kanji", meaning:"bullet train", pos:"noun" },
+          { base:"は", kana:"", romaji:"wa", literal:"[topic]", literalRole:"particle", script:"particle", meaning:"topic marker", pos:"particle" },
+          { base:"3時", kana:"さんじ", romaji:"sanji", literal:"3-o’clock", script:"kanji", meaning:"3 o’clock", pos:"noun" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+          { punct:"。" }
+        ],
+        end:"You buy your ticket. Off to the platform! 🚄" }
+    }
+  },
+
+  /* ---------- 3. HOTEL CHECK-IN ---------- */
+  {
+    id:"hotel", emoji:"🏨", name:"Hotel Check-in", nameJp:"ホテルで",
+    setting:"You arrive at your Tokyo hotel. The clerk bows behind the front desk.",
+    start:"h1",
+    nodes:{
+      "h1":{ speaker:"host", gloss:"Welcome. Do you have a reservation?",
+        tokens:[
+          { base:"いらっしゃいませ", kana:"", romaji:"irasshaimase", literal:"welcome", script:"hiragana", meaning:"welcome", pos:"set phrase" },
+          { punct:"。" },
+          { base:"ご予約", kana:"ごよやく", romaji:"goyoyaku", literal:"reservation", script:"kanji", meaning:"reservation (polite)", pos:"noun" },
+          { base:"は", kana:"", romaji:"wa", literal:"[topic]", literalRole:"particle", script:"particle", meaning:"topic marker", pos:"particle" },
+          { base:"ございます", kana:"", romaji:"gozaimasu", literal:"have", script:"hiragana", meaning:"have / there is (very polite)", pos:"verb" },
+          { base:"か", kana:"", romaji:"ka", literal:"?", literalRole:"particle", script:"particle", meaning:"question marker", pos:"particle" },
+          { punct:"？" }
+        ],
+        choices:[
+          { gloss:"Yes, under the name Ragin.", next:"h2",
+            tokens:[
+              { base:"はい", kana:"", romaji:"hai", literal:"yes", script:"hiragana", meaning:"yes", pos:"interjection" },
+              { punct:"、" },
+              { base:"ラギン", kana:"", romaji:"ragin", literal:"Ragin", script:"katakana", meaning:"Ragin (name in katakana)", pos:"name" },
+              { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+              { punct:"。" }
+            ] },
+          { gloss:"No, I don’t have one.", next:"h2",
+            tokens:[
+              { base:"いいえ", kana:"", romaji:"iie", literal:"no", script:"hiragana", meaning:"no", pos:"interjection" },
+              { punct:"、" },
+              { base:"予約", kana:"よやく", romaji:"yoyaku", literal:"reservation", script:"kanji", meaning:"reservation", pos:"noun" },
+              { base:"は", kana:"", romaji:"wa", literal:"[topic]", literalRole:"particle", script:"particle", meaning:"topic marker", pos:"particle" },
+              { base:"していません", kana:"", romaji:"shiteimasen", literal:"not-done", script:"hiragana", meaning:"haven’t done (polite negative)", pos:"verb" },
+              { punct:"。" }
+            ] }
+        ] },
+      "h2":{ speaker:"host", gloss:"Understood. May I see your passport?",
+        tokens:[
+          { base:"承知しました", kana:"しょうちしました", romaji:"shouchishimashita", literal:"understood", script:"kanji", meaning:"understood (polite)", pos:"set phrase" },
+          { punct:"。" },
+          { base:"パスポート", kana:"", romaji:"pasupooto", literal:"passport", script:"katakana", meaning:"passport (foreign loanword)", pos:"noun" },
+          { base:"を", kana:"", romaji:"o", literal:"[obj]", literalRole:"particle", script:"particle", meaning:"object marker", pos:"particle" },
+          { base:"お見せください", kana:"おみせください", romaji:"omisekudasai", literal:"please-show", script:"kanji", meaning:"please show (polite)", pos:"verb" },
+          { punct:"。" }
+        ],
+        next:"h3" },
+      "h3":{ speaker:"host", gloss:"Your room is on the 5th floor. Breakfast is from 7 to 9.",
+        tokens:[
+          { base:"お部屋", kana:"おへや", romaji:"oheya", literal:"room", script:"kanji", meaning:"room (polite)", pos:"noun" },
+          { base:"は", kana:"", romaji:"wa", literal:"[topic]", literalRole:"particle", script:"particle", meaning:"topic marker", pos:"particle" },
+          { base:"5階", kana:"ごかい", romaji:"gokai", literal:"5th-floor", script:"kanji", meaning:"5th floor", pos:"noun" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+          { punct:"。" },
+          { base:"朝食", kana:"ちょうしょく", romaji:"choushoku", literal:"breakfast", script:"kanji", meaning:"breakfast", pos:"noun" },
+          { base:"は", kana:"", romaji:"wa", literal:"[topic]", literalRole:"particle", script:"particle", meaning:"topic marker", pos:"particle" },
+          { base:"7時", kana:"しちじ", romaji:"shichiji", literal:"7-o’clock", script:"kanji", meaning:"7 o’clock", pos:"noun" },
+          { base:"から", kana:"", romaji:"kara", literal:"from", literalRole:"particle", script:"particle", meaning:"from (time)", pos:"particle" },
+          { base:"9時", kana:"くじ", romaji:"kuji", literal:"9-o’clock", script:"kanji", meaning:"9 o’clock", pos:"noun" },
+          { base:"まで", kana:"", romaji:"made", literal:"until", literalRole:"particle", script:"particle", meaning:"until", pos:"particle" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+          { punct:"。" }
+        ],
+        end:"You’re checked in. Time to drop the bags and explore. 🗝️" }
+    }
+  },
+
+  /* ---------- 4. CONVENIENCE STORE ---------- */
+  {
+    id:"konbini", emoji:"🏪", name:"Convenience Store", nameJp:"コンビニで",
+    setting:"You bring a bento and a drink to the counter at a 7-Eleven. The clerk smiles.",
+    start:"k1",
+    nodes:{
+      "k1":{ speaker:"host", gloss:"Should I heat up your bento?",
+        tokens:[
+          { base:"お弁当", kana:"おべんとう", romaji:"obentou", literal:"lunch-box", script:"kanji", meaning:"bento (lunch box)", pos:"noun" },
+          { punct:"、" },
+          { base:"温めます", kana:"あたためます", romaji:"atatamemasu", literal:"heat-up", script:"kanji", meaning:"heat up (polite)", pos:"verb" },
+          { base:"か", kana:"", romaji:"ka", literal:"?", literalRole:"particle", script:"particle", meaning:"question marker", pos:"particle" },
+          { punct:"？" }
+        ],
+        choices:[
+          { gloss:"Yes please.", next:"k2",
+            tokens:[
+              { base:"はい", kana:"", romaji:"hai", literal:"yes", script:"hiragana", meaning:"yes", pos:"interjection" },
+              { punct:"、" },
+              { base:"お願いします", kana:"おねがいします", romaji:"onegaishimasu", literal:"please", script:"kanji", meaning:"please", pos:"set phrase" },
+              { punct:"。" }
+            ] },
+          { gloss:"No, it’s fine.", next:"k2",
+            tokens:[
+              { base:"いいえ", kana:"", romaji:"iie", literal:"no", script:"hiragana", meaning:"no", pos:"interjection" },
+              { punct:"、" },
+              { base:"大丈夫", kana:"だいじょうぶ", romaji:"daijoubu", literal:"all-right", script:"kanji", meaning:"all right / okay", pos:"adjective" },
+              { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+              { punct:"。" }
+            ] }
+        ] },
+      "k2":{ speaker:"host", gloss:"Would you like a bag?",
+        tokens:[
+          { base:"袋", kana:"ふくろ", romaji:"fukuro", literal:"bag", script:"kanji", meaning:"bag", pos:"noun" },
+          { base:"は", kana:"", romaji:"wa", literal:"[topic]", literalRole:"particle", script:"particle", meaning:"topic marker", pos:"particle" },
+          { base:"ご利用", kana:"ごりよう", romaji:"goriyou", literal:"use", script:"kanji", meaning:"use (polite)", pos:"noun" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+          { base:"か", kana:"", romaji:"ka", literal:"?", literalRole:"particle", script:"particle", meaning:"question marker", pos:"particle" },
+          { punct:"？" }
+        ],
+        choices:[
+          { gloss:"Yes please.", next:"k3",
+            tokens:[
+              { base:"お願いします", kana:"おねがいします", romaji:"onegaishimasu", literal:"please", script:"kanji", meaning:"please", pos:"set phrase" },
+              { punct:"。" }
+            ] },
+          { gloss:"No need.", next:"k3",
+            tokens:[
+              { base:"いりません", kana:"", romaji:"irimasen", literal:"don’t-need", script:"hiragana", meaning:"don’t need (polite negative)", pos:"verb" },
+              { punct:"。" }
+            ] }
+        ] },
+      "k3":{ speaker:"host", gloss:"That comes to 500 yen.",
+        tokens:[
+          { base:"500円", kana:"ごひゃくえん", romaji:"gohyakuen", literal:"500-yen", script:"kanji", meaning:"500 yen", pos:"noun" },
+          { base:"に", kana:"", romaji:"ni", literal:"to", literalRole:"particle", script:"particle", meaning:"to (becomes)", pos:"particle" },
+          { base:"なります", kana:"", romaji:"narimasu", literal:"becomes", script:"hiragana", meaning:"becomes (polite)", pos:"verb" },
+          { punct:"。" }
+        ],
+        choices:[
+          { gloss:"By card.", next:"k4",
+            tokens:[
+              { base:"カード", kana:"", romaji:"kaado", literal:"card", script:"katakana", meaning:"card (foreign loanword)", pos:"noun" },
+              { base:"で", kana:"", romaji:"de", literal:"with", literalRole:"particle", script:"particle", meaning:"with / by means of", pos:"particle" },
+              { base:"お願いします", kana:"おねがいします", romaji:"onegaishimasu", literal:"please", script:"kanji", meaning:"please", pos:"set phrase" },
+              { punct:"。" }
+            ] },
+          { gloss:"Cash.", next:"k4",
+            tokens:[
+              { base:"現金", kana:"げんきん", romaji:"genkin", literal:"cash", script:"kanji", meaning:"cash", pos:"noun" },
+              { base:"で", kana:"", romaji:"de", literal:"with", literalRole:"particle", script:"particle", meaning:"with / by means of", pos:"particle" },
+              { punct:"。" }
+            ] }
+        ] },
+      "k4":{ speaker:"host", gloss:"Thank you very much. Please come again.",
+        tokens:[
+          { base:"ありがとうございました", kana:"", romaji:"arigatougozaimashita", literal:"thank-you", script:"hiragana", meaning:"thank you (polite past)", pos:"set phrase" },
+          { punct:"。" },
+          { base:"またお越しください", kana:"またおこしください", romaji:"mataokoshikudasai", literal:"come-again", script:"kanji", meaning:"please come again", pos:"set phrase" },
+          { punct:"。" }
+        ],
+        end:"You step back out into Tokyo with snacks in hand. 🍱" }
+    }
+  },
+
+  /* ---------- 5. ASKING DIRECTIONS ---------- */
+  {
+    id:"directions", emoji:"🗺️", name:"Asking Directions", nameJp:"道を聞く",
+    setting:"You’re lost in Shibuya trying to find the train station. You stop a friendly-looking stranger.",
+    start:"d1",
+    nodes:{
+      "d1":{ speaker:"you-prompt", gloss:"You decide what to ask...",
+        tokens:[],
+        choices:[
+          { gloss:"Excuse me, where is the station?", next:"d2station",
+            tokens:[
+              { base:"すみません", kana:"", romaji:"sumimasen", literal:"excuse-me", script:"hiragana", meaning:"excuse me / sorry", pos:"set phrase" },
+              { punct:"、" },
+              { base:"駅", kana:"えき", romaji:"eki", literal:"station", script:"kanji", meaning:"train station", pos:"noun" },
+              { base:"は", kana:"", romaji:"wa", literal:"[topic]", literalRole:"particle", script:"particle", meaning:"topic marker", pos:"particle" },
+              { base:"どこ", kana:"", romaji:"doko", literal:"where", script:"hiragana", meaning:"where", pos:"pronoun" },
+              { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+              { base:"か", kana:"", romaji:"ka", literal:"?", literalRole:"particle", script:"particle", meaning:"question marker", pos:"particle" },
+              { punct:"？" }
+            ] },
+          { gloss:"Excuse me, is there a convenience store nearby?", next:"d2konbini",
+            tokens:[
+              { base:"すみません", kana:"", romaji:"sumimasen", literal:"excuse-me", script:"hiragana", meaning:"excuse me", pos:"set phrase" },
+              { punct:"、" },
+              { base:"近く", kana:"ちかく", romaji:"chikaku", literal:"nearby", script:"kanji", meaning:"nearby", pos:"noun" },
+              { base:"に", kana:"", romaji:"ni", literal:"at", literalRole:"particle", script:"particle", meaning:"location particle", pos:"particle" },
+              { base:"コンビニ", kana:"", romaji:"konbini", literal:"convenience-store", script:"katakana", meaning:"convenience store", pos:"noun" },
+              { base:"は", kana:"", romaji:"wa", literal:"[topic]", literalRole:"particle", script:"particle", meaning:"topic marker", pos:"particle" },
+              { base:"あります", kana:"", romaji:"arimasu", literal:"exists", script:"hiragana", meaning:"there is / exists (polite)", pos:"verb" },
+              { base:"か", kana:"", romaji:"ka", literal:"?", literalRole:"particle", script:"particle", meaning:"question marker", pos:"particle" },
+              { punct:"？" }
+            ] },
+          { gloss:"Excuse me, I’m looking for a restroom.", next:"d2toilet",
+            tokens:[
+              { base:"すみません", kana:"", romaji:"sumimasen", literal:"excuse-me", script:"hiragana", meaning:"excuse me", pos:"set phrase" },
+              { punct:"、" },
+              { base:"トイレ", kana:"", romaji:"toire", literal:"toilet", script:"katakana", meaning:"toilet / restroom", pos:"noun" },
+              { base:"を", kana:"", romaji:"o", literal:"[obj]", literalRole:"particle", script:"particle", meaning:"object marker", pos:"particle" },
+              { base:"探しています", kana:"さがしています", romaji:"sagashiteimasu", literal:"looking-for", script:"kanji", meaning:"am looking for (polite progressive)", pos:"verb" },
+              { punct:"。" }
+            ] }
+        ] },
+      "d2station":{ speaker:"host", gloss:"The station? Go straight, then it’s on the right. About 3 minutes.",
+        tokens:[
+          { base:"駅", kana:"えき", romaji:"eki", literal:"station", script:"kanji", meaning:"station", pos:"noun" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+          { base:"ね", kana:"", romaji:"ne", literal:"right?", literalRole:"particle", script:"particle", meaning:"isn’t it?", pos:"particle" },
+          { punct:"？" },
+          { base:"まっすぐ", kana:"", romaji:"massugu", literal:"straight", script:"hiragana", meaning:"straight", pos:"adverb" },
+          { base:"行って", kana:"いって", romaji:"itte", literal:"go-and", script:"kanji", meaning:"go (te-form)", pos:"verb" },
+          { punct:"、" },
+          { base:"右", kana:"みぎ", romaji:"migi", literal:"right", script:"kanji", meaning:"right (direction)", pos:"noun" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+          { punct:"。" }
+        ],
+        next:"d3" },
+      "d2konbini":{ speaker:"host", gloss:"Yes, there’s one across the street.",
+        tokens:[
+          { base:"はい", kana:"", romaji:"hai", literal:"yes", script:"hiragana", meaning:"yes", pos:"interjection" },
+          { punct:"、" },
+          { base:"道", kana:"みち", romaji:"michi", literal:"road", script:"kanji", meaning:"road / street", pos:"noun" },
+          { base:"の", kana:"", romaji:"no", literal:"of", literalRole:"particle", script:"particle", meaning:"of (linking)", pos:"particle" },
+          { base:"向こう", kana:"むこう", romaji:"mukou", literal:"other-side", script:"kanji", meaning:"other side / across", pos:"noun" },
+          { base:"に", kana:"", romaji:"ni", literal:"at", literalRole:"particle", script:"particle", meaning:"location particle", pos:"particle" },
+          { base:"あります", kana:"", romaji:"arimasu", literal:"exists", script:"hiragana", meaning:"there is", pos:"verb" },
+          { punct:"。" }
+        ],
+        next:"d3" },
+      "d2toilet":{ speaker:"host", gloss:"There’s one in that station over there.",
+        tokens:[
+          { base:"あそこ", kana:"", romaji:"asoko", literal:"over-there", script:"hiragana", meaning:"over there", pos:"pronoun" },
+          { base:"の", kana:"", romaji:"no", literal:"of", literalRole:"particle", script:"particle", meaning:"of (linking)", pos:"particle" },
+          { base:"駅", kana:"えき", romaji:"eki", literal:"station", script:"kanji", meaning:"station", pos:"noun" },
+          { base:"に", kana:"", romaji:"ni", literal:"at", literalRole:"particle", script:"particle", meaning:"location particle", pos:"particle" },
+          { base:"あります", kana:"", romaji:"arimasu", literal:"exists", script:"hiragana", meaning:"there is", pos:"verb" },
+          { base:"よ", kana:"", romaji:"yo", literal:"!", literalRole:"particle", script:"particle", meaning:"emphasis (telling you something)", pos:"particle" },
+          { punct:"。" }
+        ],
+        next:"d3" },
+      "d3":{ speaker:"you-prompt", gloss:"How do you respond?",
+        tokens:[],
+        choices:[
+          { gloss:"Thank you very much.", next:"d4thanks",
+            tokens:[
+              { base:"ありがとうございます", kana:"", romaji:"arigatougozaimasu", literal:"thank-you", script:"hiragana", meaning:"thank you (polite)", pos:"set phrase" },
+              { punct:"。" }
+            ] },
+          { gloss:"Could you say that once more?", next:"d4again",
+            tokens:[
+              { base:"もう一度", kana:"もういちど", romaji:"mouichido", literal:"one-more-time", script:"kanji", meaning:"one more time", pos:"adverb" },
+              { base:"お願いします", kana:"おねがいします", romaji:"onegaishimasu", literal:"please", script:"kanji", meaning:"please", pos:"set phrase" },
+              { punct:"。" }
+            ] }
+        ] },
+      "d4thanks":{ speaker:"host", gloss:"Not at all. Take care.",
+        tokens:[
+          { base:"いいえ", kana:"", romaji:"iie", literal:"no-no", script:"hiragana", meaning:"no (you’re welcome)", pos:"interjection" },
+          { punct:"。" },
+          { base:"気をつけて", kana:"きをつけて", romaji:"kiwotsukete", literal:"take-care", script:"kanji", meaning:"take care", pos:"set phrase" },
+          { punct:"。" }
+        ],
+        end:"You set off, slightly less lost. 🚶" },
+      "d4again":{ speaker:"host", gloss:"Sure — go straight, then turn right.",
+        tokens:[
+          { base:"はい", kana:"", romaji:"hai", literal:"yes", script:"hiragana", meaning:"yes / sure", pos:"interjection" },
+          { punct:"、" },
+          { base:"まっすぐ", kana:"", romaji:"massugu", literal:"straight", script:"hiragana", meaning:"straight", pos:"adverb" },
+          { base:"行って", kana:"いって", romaji:"itte", literal:"go-and", script:"kanji", meaning:"go", pos:"verb" },
+          { punct:"、" },
+          { base:"右", kana:"みぎ", romaji:"migi", literal:"right", script:"kanji", meaning:"right", pos:"noun" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+          { punct:"。" }
+        ],
+        end:"Got it this time. Off you go. 🚶" }
+    }
+  }
+];
+
+/* ============================================================
+   CHARACTER BREAKDOWNS — shared lookup
+   Keyed by token.base. Used when a token does not have its own
+   chars[] array (saves data duplication across scenarios).
+   ============================================================ */
+const CHAR_BREAKDOWNS = {
+  /* ----- common set phrases ----- */
+  "いらっしゃいませ": [
+    {c:"い",s:"i",r:"sound"},{c:"ら",s:"ra"},
+    {c:"っ",s:"(small tsu)",r:"doubles the next consonant"},
+    {c:"し",s:"shi"},{c:"ゃ",s:"ya",r:"small ya → sha"},
+    {c:"い",s:"i"},{c:"ま",s:"ma",r:"polite suffix"},{c:"せ",s:"se",r:"command form ending — 'welcome!'"}
+  ],
+  "お願いします": [
+    {c:"お",s:"o",r:"polite prefix"},
+    {c:"願",s:"nega(i)",r:"wish / request"},
+    {c:"い",s:"i",r:"verb stem"},
+    {c:"し",s:"shi",r:"do"},{c:"ま",s:"ma",r:"polite"},{c:"す",s:"su",r:"non-past polite"}
+  ],
+  "ありがとうございます": [
+    {c:"あ",s:"a"},{c:"り",s:"ri"},{c:"が",s:"ga"},{c:"と",s:"to"},{c:"う",s:"u",r:"long vowel"},
+    {c:"ご",s:"go",r:"polite prefix"},{c:"ざ",s:"za"},{c:"い",s:"i"},
+    {c:"ま",s:"ma",r:"polite"},{c:"す",s:"su",r:"non-past polite — 'thank you'"}
+  ],
+  "ありがとうございました": [
+    {c:"あ",s:"a"},{c:"り",s:"ri"},{c:"が",s:"ga"},{c:"と",s:"to"},{c:"う",s:"u",r:"long vowel"},
+    {c:"ご",s:"go"},{c:"ざ",s:"za"},{c:"い",s:"i"},
+    {c:"ま",s:"ma"},{c:"し",s:"shi",r:"past"},{c:"た",s:"ta",r:"past ending — 'thank you (past)'"}
+  ],
+  "すみません": [
+    {c:"す",s:"su"},{c:"み",s:"mi"},
+    {c:"ま",s:"ma",r:"polite suffix"},
+    {c:"せ",s:"se",r:"negative"},
+    {c:"ん",s:"n",r:"polite negative ending — 'excuse me / sorry'"}
+  ],
+  "かしこまりました": [
+    {c:"か",s:"ka"},{c:"し",s:"shi"},{c:"こ",s:"ko"},
+    {c:"ま",s:"ma"},{c:"り",s:"ri"},
+    {c:"ま",s:"ma"},{c:"し",s:"shi",r:"past"},{c:"た",s:"ta",r:"polite past — 'certainly'"}
+  ],
+  "承知しました": [
+    {c:"承",s:"shou",r:"acknowledge"},
+    {c:"知",s:"chi",r:"know"},
+    {c:"し",s:"shi",r:"do"},
+    {c:"ま",s:"ma",r:"polite"},
+    {c:"し",s:"shi",r:"past"},{c:"た",s:"ta",r:"past ending"}
+  ],
+  "またお越しください": [
+    {c:"ま",s:"ma"},{c:"た",s:"ta",r:"again"},
+    {c:"お",s:"o",r:"polite prefix"},
+    {c:"越",s:"ko",r:"go / cross"},
+    {c:"し",s:"shi",r:"stem"},
+    {c:"く",s:"ku"},{c:"だ",s:"da"},{c:"さ",s:"sa"},{c:"い",s:"i",r:"please"}
+  ],
+  "気をつけて": [
+    {c:"気",s:"ki",r:"spirit / attention"},
+    {c:"を",s:"o",r:"object marker"},
+    {c:"つ",s:"tsu"},{c:"け",s:"ke",r:"attach"},{c:"て",s:"te",r:"connector — 'take care'"}
+  ],
+  "お見せください": [
+    {c:"お",s:"o",r:"polite prefix"},
+    {c:"見",s:"mi",r:"see"},
+    {c:"せ",s:"se",r:"causative — 'show'"},
+    {c:"く",s:"ku"},{c:"だ",s:"da"},{c:"さ",s:"sa"},{c:"い",s:"i",r:"please give"}
+  ],
+  "お待ちください": [
+    {c:"お",s:"o",r:"polite prefix"},
+    {c:"待",s:"ma",r:"wait"},
+    {c:"ち",s:"chi",r:"stem"},
+    {c:"く",s:"ku"},{c:"だ",s:"da"},{c:"さ",s:"sa"},{c:"い",s:"i",r:"please"}
+  ],
+  "ください": [
+    {c:"く",s:"ku"},{c:"だ",s:"da"},{c:"さ",s:"sa"},{c:"い",s:"i",r:"together: please give"}
+  ],
+
+  /* ----- single-character particles ----- */
+  "です": [{c:"で",s:"de"},{c:"す",s:"su",r:"polite copula 'is/am/are'"}],
+  "か": [{c:"か",s:"ka",r:"question particle"}],
+  "は": [{c:"は",s:"wa",r:"topic marker — written ha, read wa"}],
+  "を": [{c:"を",s:"o",r:"object marker — written wo, read o"}],
+  "に": [{c:"に",s:"ni",r:"to / at / in particle"}],
+  "で": [{c:"で",s:"de",r:"location / means particle"}],
+  "の": [{c:"の",s:"no",r:"possessive / linking particle"}],
+  "が": [{c:"が",s:"ga",r:"subject marker"}],
+  "ね": [{c:"ね",s:"ne",r:"seeking agreement — 'right?'"}],
+  "よ": [{c:"よ",s:"yo",r:"emphasis — 'I'm telling you'"}],
+  "へ": [{c:"へ",s:"e",r:"direction particle — written he, read e"}],
+  "から": [{c:"か",s:"ka"},{c:"ら",s:"ra",r:"together: 'from'"}],
+  "まで": [{c:"ま",s:"ma"},{c:"で",s:"de",r:"together: 'until / to'"}],
+
+  /* ----- yes / no / response words ----- */
+  "はい": [{c:"は",s:"ha"},{c:"い",s:"i",r:"together: yes"}],
+  "いいえ": [{c:"い",s:"i"},{c:"い",s:"i",r:"doubled long vowel"},{c:"え",s:"e",r:"together: no"}],
+
+  /* ----- counters & numbers ----- */
+  "二人": [{c:"二",s:"futa",r:"two"},{c:"人",s:"ri",r:"person (paired reading)"}],
+  "一人": [{c:"一",s:"hito",r:"one"},{c:"人",s:"ri",r:"person (paired reading)"}],
+  "四人": [{c:"四",s:"yo",r:"four"},{c:"人",s:"nin",r:"person"}],
+  "何名様": [
+    {c:"何",s:"nan",r:"how many"},
+    {c:"名",s:"mei",r:"count of people"},
+    {c:"様",s:"sama",r:"honorific (very polite)"}
+  ],
+  "何": [{c:"何",s:"nan / nani",r:"what / how many"}],
+  "少々": [
+    {c:"少",s:"shou",r:"few / little"},
+    {c:"々",s:"shou",r:"repetition mark — doubles previous kanji"}
+  ],
+  "3時": [{c:"3",s:"san",r:"three"},{c:"時",s:"ji",r:"o'clock"}],
+  "5階": [{c:"5",s:"go",r:"five"},{c:"階",s:"kai",r:"floor / level"}],
+  "7時": [{c:"7",s:"shichi",r:"seven"},{c:"時",s:"ji",r:"o'clock"}],
+  "9時": [{c:"9",s:"ku",r:"nine"},{c:"時",s:"ji",r:"o'clock"}],
+  "500円": [
+    {c:"5",s:"go",r:"five"},
+    {c:"0",s:"hyaku",r:"hundred"},
+    {c:"0",s:"-",r:"placeholder"},
+    {c:"円",s:"en",r:"yen"}
+  ],
+  "もう一度": [
+    {c:"も",s:"mo"},{c:"う",s:"u",r:"already"},
+    {c:"一",s:"ichi",r:"one"},{c:"度",s:"do",r:"time — together: 'once more'"}
+  ],
+
+  /* ----- places ----- */
+  "京都": [{c:"京",s:"kyou",r:"capital"},{c:"都",s:"to",r:"metropolis"}],
+  "大阪": [{c:"大",s:"oo",r:"big"},{c:"阪",s:"saka",r:"hill"}],
+  "新宿": [{c:"新",s:"shin",r:"new"},{c:"宿",s:"juku",r:"lodging / inn"}],
+  "駅": [{c:"駅",s:"eki",r:"train station"}],
+  "道": [{c:"道",s:"michi",r:"road / path"}],
+  "向こう": [
+    {c:"向",s:"mu",r:"facing"},{c:"こ",s:"ko"},{c:"う",s:"u",r:"long vowel — 'the far side / across'"}
+  ],
+  "近く": [{c:"近",s:"chika",r:"near"},{c:"く",s:"ku",r:"adverb ending"}],
+  "右": [{c:"右",s:"migi",r:"right"}],
+
+  /* ----- demonstratives ----- */
+  "こちら": [
+    {c:"こ",s:"ko",r:"this (near speaker)"},
+    {c:"ち",s:"chi"},{c:"ら",s:"ra",r:"-ward direction"}
+  ],
+  "どちら": [
+    {c:"ど",s:"do",r:"which"},
+    {c:"ち",s:"chi"},{c:"ら",s:"ra",r:"-ward direction"}
+  ],
+  "どうぞ": [
+    {c:"ど",s:"do"},{c:"う",s:"u",r:"long vowel"},
+    {c:"ぞ",s:"zo",r:"emphasis — 'please, go ahead'"}
+  ],
+  "どこ": [{c:"ど",s:"do",r:"which"},{c:"こ",s:"ko",r:"place — together: where"}],
+  "あそこ": [
+    {c:"あ",s:"a",r:"that (far)"},
+    {c:"そ",s:"so"},{c:"こ",s:"ko",r:"place — together: over there"}
+  ],
+  "まっすぐ": [
+    {c:"ま",s:"ma"},{c:"っ",s:"(small tsu)",r:"doubles next consonant"},
+    {c:"す",s:"su"},{c:"ぐ",s:"gu",r:"together: straight"}
+  ],
+
+  /* ----- food / drink / things ----- */
+  "お飲み物": [
+    {c:"お",s:"o",r:"polite prefix"},
+    {c:"飲",s:"no",r:"drink"},{c:"み",s:"mi",r:"verb stem"},
+    {c:"物",s:"mono",r:"thing"}
+  ],
+  "ビール": [{c:"ビ",s:"bi"},{c:"ー",s:"—",r:"long vowel"},{c:"ル",s:"ru"}],
+  "水": [{c:"水",s:"mizu",r:"water"}],
+  "いい": [{c:"い",s:"i"},{c:"い",s:"i",r:"doubled for long vowel — 'good'"}],
+  "お茶": [{c:"お",s:"o",r:"polite prefix"},{c:"茶",s:"cha",r:"tea"}],
+  "お弁当": [
+    {c:"お",s:"o",r:"polite prefix"},
+    {c:"弁",s:"ben",r:"meal"},{c:"当",s:"tou",r:"box / portion — together: lunch box"}
+  ],
+  "袋": [{c:"袋",s:"fukuro",r:"bag"}],
+
+  /* ----- katakana loan words ----- */
+  "パスポート": [
+    {c:"パ",s:"pa"},{c:"ス",s:"su"},{c:"ポ",s:"po"},{c:"ー",s:"—",r:"long vowel"},{c:"ト",s:"to"}
+  ],
+  "カード": [{c:"カ",s:"ka"},{c:"ー",s:"—",r:"long vowel"},{c:"ド",s:"do"}],
+  "コンビニ": [
+    {c:"コ",s:"ko"},{c:"ン",s:"n",r:"nasal"},{c:"ビ",s:"bi"},{c:"ニ",s:"ni",r:"shortened from 'convenience store'"}
+  ],
+  "トイレ": [{c:"ト",s:"to"},{c:"イ",s:"i"},{c:"レ",s:"re",r:"from 'toilet'"}],
+  "ラギン": [{c:"ラ",s:"ra"},{c:"ギ",s:"gi"},{c:"ン",s:"n",r:"nasal — name in katakana"}],
+
+  /* ----- nouns w/ polite prefixes ----- */
+  "予約": [{c:"予",s:"yo",r:"in advance"},{c:"約",s:"yaku",r:"promise / agreement"}],
+  "ご予約": [
+    {c:"ご",s:"go",r:"polite prefix"},
+    {c:"予",s:"yo",r:"in advance"},{c:"約",s:"yaku",r:"promise — together: reservation"}
+  ],
+  "お部屋": [
+    {c:"お",s:"o",r:"polite prefix"},
+    {c:"部",s:"he",r:"part / room"},{c:"屋",s:"ya",r:"building"}
+  ],
+  "朝食": [{c:"朝",s:"chou",r:"morning"},{c:"食",s:"shoku",r:"meal"}],
+  "ご利用": [
+    {c:"ご",s:"go",r:"polite prefix"},
+    {c:"利",s:"ri",r:"benefit"},{c:"用",s:"you",r:"use"}
+  ],
+  "現金": [{c:"現",s:"gen",r:"current / actual"},{c:"金",s:"kin",r:"money / gold"}],
+  "大丈夫": [
+    {c:"大",s:"dai",r:"big"},{c:"丈",s:"jou",r:"length / strong"},
+    {c:"夫",s:"bu",r:"man — together: all right / okay"}
+  ],
+  "片道": [{c:"片",s:"kata",r:"one side"},{c:"道",s:"michi",r:"road"}],
+  "往復": [{c:"往",s:"ou",r:"go"},{c:"復",s:"fuku",r:"return"}],
+  "次": [{c:"次",s:"tsugi",r:"next"}],
+  "新幹線": [
+    {c:"新",s:"shin",r:"new"},
+    {c:"幹",s:"kan",r:"main line"},{c:"線",s:"sen",r:"line"}
+  ],
+
+  /* ----- verbs ----- */
+  "します": [
+    {c:"し",s:"shi",r:"do"},{c:"ま",s:"ma",r:"polite"},{c:"す",s:"su",r:"non-past polite"}
+  ],
+  "なります": [
+    {c:"な",s:"na"},{c:"り",s:"ri"},
+    {c:"ま",s:"ma",r:"polite"},{c:"す",s:"su",r:"non-past polite — 'becomes'"}
+  ],
+  "あります": [
+    {c:"あ",s:"a",r:"exist (for things)"},{c:"り",s:"ri"},
+    {c:"ま",s:"ma"},{c:"す",s:"su",r:"polite"}
+  ],
+  "ございます": [
+    {c:"ご",s:"go",r:"polite prefix"},{c:"ざ",s:"za"},{c:"い",s:"i"},
+    {c:"ま",s:"ma"},{c:"す",s:"su",r:"very polite 'is / there is'"}
+  ],
+  "いりません": [
+    {c:"い",s:"i",r:"need"},{c:"り",s:"ri"},
+    {c:"ま",s:"ma"},{c:"せ",s:"se"},{c:"ん",s:"n",r:"polite negative — 'don't need'"}
+  ],
+  "していません": [
+    {c:"し",s:"shi",r:"do"},{c:"て",s:"te",r:"connector"},
+    {c:"い",s:"i",r:"be"},
+    {c:"ま",s:"ma"},{c:"せ",s:"se"},{c:"ん",s:"n",r:"polite negative — 'haven't done'"}
+  ],
+  "温めます": [
+    {c:"温",s:"ata",r:"warm"},{c:"め",s:"me",r:"verb stem"},
+    {c:"ま",s:"ma"},{c:"す",s:"su",r:"polite — 'heat up'"}
+  ],
+  "行って": [
+    {c:"行",s:"i",r:"go"},
+    {c:"っ",s:"(small tsu)",r:"doubles next consonant"},
+    {c:"て",s:"te",r:"connector — 'go and...'"}
+  ],
+  "探しています": [
+    {c:"探",s:"saga",r:"search"},{c:"し",s:"shi",r:"stem"},
+    {c:"て",s:"te",r:"connector"},{c:"い",s:"i",r:"be"},
+    {c:"ま",s:"ま"},{c:"す",s:"su",r:"-ing form: 'am searching'"}
+  ]
+};
+
+/* ============================================================
+   KANA CHART DATA
+   ============================================================ */
+const KANA_BASIC = [
+  { label:'', cells:[
+    {h:'あ',k:'ア',r:'a'},{h:'い',k:'イ',r:'i'},{h:'う',k:'ウ',r:'u'},{h:'え',k:'エ',r:'e'},{h:'お',k:'オ',r:'o'}
+  ]},
+  { label:'k', cells:[
+    {h:'か',k:'カ',r:'ka'},{h:'き',k:'キ',r:'ki'},{h:'く',k:'ク',r:'ku'},{h:'け',k:'ケ',r:'ke'},{h:'こ',k:'コ',r:'ko'}
+  ]},
+  { label:'s', cells:[
+    {h:'さ',k:'サ',r:'sa'},{h:'し',k:'シ',r:'shi'},{h:'す',k:'ス',r:'su'},{h:'せ',k:'セ',r:'se'},{h:'そ',k:'ソ',r:'so'}
+  ]},
+  { label:'t', cells:[
+    {h:'た',k:'タ',r:'ta'},{h:'ち',k:'チ',r:'chi'},{h:'つ',k:'ツ',r:'tsu'},{h:'て',k:'テ',r:'te'},{h:'と',k:'ト',r:'to'}
+  ]},
+  { label:'n', cells:[
+    {h:'な',k:'ナ',r:'na'},{h:'に',k:'ニ',r:'ni'},{h:'ぬ',k:'ヌ',r:'nu'},{h:'ね',k:'ネ',r:'ne'},{h:'の',k:'ノ',r:'no'}
+  ]},
+  { label:'h', cells:[
+    {h:'は',k:'ハ',r:'ha'},{h:'ひ',k:'ヒ',r:'hi'},{h:'ふ',k:'フ',r:'fu'},{h:'へ',k:'ヘ',r:'he'},{h:'ほ',k:'ホ',r:'ho'}
+  ]},
+  { label:'m', cells:[
+    {h:'ま',k:'マ',r:'ma'},{h:'み',k:'ミ',r:'mi'},{h:'む',k:'ム',r:'mu'},{h:'め',k:'メ',r:'me'},{h:'も',k:'モ',r:'mo'}
+  ]},
+  { label:'y', cells:[
+    {h:'や',k:'ヤ',r:'ya'},null,{h:'ゆ',k:'ユ',r:'yu'},null,{h:'よ',k:'ヨ',r:'yo'}
+  ]},
+  { label:'r', cells:[
+    {h:'ら',k:'ラ',r:'ra'},{h:'り',k:'リ',r:'ri'},{h:'る',k:'ル',r:'ru'},{h:'れ',k:'レ',r:'re'},{h:'ろ',k:'ロ',r:'ro'}
+  ]},
+  { label:'w', cells:[
+    {h:'わ',k:'ワ',r:'wa'},null,null,null,{h:'を',k:'ヲ',r:'wo'}
+  ]},
+  { label:'', cells:[
+    {h:'ん',k:'ン',r:'n'},null,null,null,null
+  ]}
+];
+
+const KANA_DAKUTEN = [
+  { label:'g', cells:[
+    {h:'が',k:'ガ',r:'ga'},{h:'ぎ',k:'ギ',r:'gi'},{h:'ぐ',k:'グ',r:'gu'},{h:'げ',k:'ゲ',r:'ge'},{h:'ご',k:'ゴ',r:'go'}
+  ]},
+  { label:'z', cells:[
+    {h:'ざ',k:'ザ',r:'za'},{h:'じ',k:'ジ',r:'ji'},{h:'ず',k:'ズ',r:'zu'},{h:'ぜ',k:'ゼ',r:'ze'},{h:'ぞ',k:'ゾ',r:'zo'}
+  ]},
+  { label:'d', cells:[
+    {h:'だ',k:'ダ',r:'da'},{h:'ぢ',k:'ヂ',r:'ji'},{h:'づ',k:'ヅ',r:'zu'},{h:'で',k:'デ',r:'de'},{h:'ど',k:'ド',r:'do'}
+  ]},
+  { label:'b', cells:[
+    {h:'ば',k:'バ',r:'ba'},{h:'び',k:'ビ',r:'bi'},{h:'ぶ',k:'ブ',r:'bu'},{h:'べ',k:'ベ',r:'be'},{h:'ぼ',k:'ボ',r:'bo'}
+  ]}
+];
+
+const KANA_HANDAKUTEN = [
+  { label:'p', cells:[
+    {h:'ぱ',k:'パ',r:'pa'},{h:'ぴ',k:'ピ',r:'pi'},{h:'ぷ',k:'プ',r:'pu'},{h:'ぺ',k:'ペ',r:'pe'},{h:'ぽ',k:'ポ',r:'po'}
+  ]}
+];
+
+const KANA_YOUON = [
+  { label:'ky', cells:[{h:'きゃ',k:'キャ',r:'kya'},{h:'きゅ',k:'キュ',r:'kyu'},{h:'きょ',k:'キョ',r:'kyo'}] },
+  { label:'sh', cells:[{h:'しゃ',k:'シャ',r:'sha'},{h:'しゅ',k:'シュ',r:'shu'},{h:'しょ',k:'ショ',r:'sho'}] },
+  { label:'ch', cells:[{h:'ちゃ',k:'チャ',r:'cha'},{h:'ちゅ',k:'チュ',r:'chu'},{h:'ちょ',k:'チョ',r:'cho'}] },
+  { label:'ny', cells:[{h:'にゃ',k:'ニャ',r:'nya'},{h:'にゅ',k:'ニュ',r:'nyu'},{h:'にょ',k:'ニョ',r:'nyo'}] },
+  { label:'hy', cells:[{h:'ひゃ',k:'ヒャ',r:'hya'},{h:'ひゅ',k:'ヒュ',r:'hyu'},{h:'ひょ',k:'ヒョ',r:'hyo'}] },
+  { label:'my', cells:[{h:'みゃ',k:'ミャ',r:'mya'},{h:'みゅ',k:'ミュ',r:'myu'},{h:'みょ',k:'ミョ',r:'myo'}] },
+  { label:'ry', cells:[{h:'りゃ',k:'リャ',r:'rya'},{h:'りゅ',k:'リュ',r:'ryu'},{h:'りょ',k:'リョ',r:'ryo'}] },
+  { label:'gy', cells:[{h:'ぎゃ',k:'ギャ',r:'gya'},{h:'ぎゅ',k:'ギュ',r:'gyu'},{h:'ぎょ',k:'ギョ',r:'gyo'}] },
+  { label:'j',  cells:[{h:'じゃ',k:'ジャ',r:'ja'},{h:'じゅ',k:'ジュ',r:'ju'},{h:'じょ',k:'ジョ',r:'jo'}] },
+  { label:'by', cells:[{h:'びゃ',k:'ビャ',r:'bya'},{h:'びゅ',k:'ビュ',r:'byu'},{h:'びょ',k:'ビョ',r:'byo'}] },
+  { label:'py', cells:[{h:'ぴゃ',k:'ピャ',r:'pya'},{h:'ぴゅ',k:'ピュ',r:'pyu'},{h:'ぴょ',k:'ピョ',r:'pyo'}] }
+];
+
+/* ============================================================
+   KANA MNEMONICS — tight visual hints per syllable
+   Tofugu-style: each mnemonic pairs the shape with a memory hook
+   that contains the sound. One line, scannable.
+   ============================================================ */
+const KANA_MNEMONICS = {
+  /* basic 46 */
+  'a':   'antenna stretching wide',
+  'i':   'two ivy vines',
+  'u':   'u-shaped house + chimney',
+  'e':   'energetic kicker',
+  'o':   'octopus with a sword',
+  'ka':  'karate kicker',
+  'ki':  'two-pronged key',
+  'ku':  'cuckoo bird beak',
+  'ke':  'keg with handle + tap',
+  'ko':  'two coat hangers stacked',
+  'sa':  'samurai topknot',
+  'shi': 'she-hook curving up',
+  'su':  'swirly nest tail',
+  'se':  'sellotape on its edge',
+  'so':  'sewing zigzag stitch',
+  'ta':  'talking face profile',
+  'chi': 'cheerleader pose',
+  'tsu': 'tsunami curling wave',
+  'te':  'telephone receiver',
+  'to':  'toe with painted nail',
+  'na':  'knot on a nailed stick',
+  'ni':  'kneeling figure + knees',
+  'nu':  'noodles in a bowl',
+  'ne':  'nest with cat tail curl',
+  'no':  'no-entry spiral',
+  'ha':  'happy figure laughing — ha!',
+  'hi':  'happy smile curve — hee!',
+  'fu':  'Mt. Fuji silhouette',
+  'he':  'a hill peak',
+  'ho':  'ho-ho-ho ladder + cross',
+  'ma':  'mama’s pinwheel',
+  'mi':  'me-21 stacked',
+  'mu':  'moo-cow with horn',
+  'me':  'an eye in profile',
+  'mo':  'more fishhooks + line',
+  'ya':  'a yacht with its mast',
+  'yu':  'a U-fish swimming',
+  'yo':  'yo-yo on a string',
+  'ra':  'rabbit hopping over',
+  'ri':  'river — two pillars',
+  'ru':  'loop curling down',
+  're':  'a wreath leaning over',
+  'ro':  'a road bending around',
+  'wa':  'a wallaby kangaroo',
+  'wo':  'won! wrestling kick',
+  'n':   'n with a flag tail',
+
+  /* dakuten — same as base + 2 dots */
+  'ga':  'ka + dots (gauntlets)',
+  'gi':  'ki + dots (gates)',
+  'gu':  'ku + dots (gulp!)',
+  'ge':  'ke + dots (geyser)',
+  'go':  'ko + dots (gobble)',
+  'za':  'sa + dots (zap!)',
+  'ji':  'shi + dots (jingle)',
+  'zu':  'su + dots (zoom!)',
+  'ze':  'se + dots (zen)',
+  'zo':  'so + dots (zoo)',
+  'da':  'ta + dots (drumming)',
+  'de':  'te + dots (debit)',
+  'do':  'to + dots (doh!)',
+  'ba':  'ha + dots (banging)',
+  'bi':  'hi + dots (beep!)',
+  'bu':  'fu + dots (Fuji blizzard)',
+  'be':  'he + dots (bell)',
+  'bo':  'ho + dots (boom!)',
+
+  /* handakuten — same as base + circle */
+  'pa':  'ha + circle (popping)',
+  'pi':  'hi + circle (peek!)',
+  'pu':  'fu + circle (puff!)',
+  'pe':  'he + circle (peep!)',
+  'po':  'ho + circle (pop!)'
+};
+
+/* ============================================================
+   KANJI READINGS — alternate on/kun readings to surface in
+   character breakdowns. Only kanji with genuinely useful
+   second readings are listed.
+   ============================================================ */
+const KANJI_READINGS = {
+  '道': { primary:'kun', kun:'michi', on:'dou / tou', examples:'柔道 (juudou) judo · 道場 (doujou) dojo · 北海道 (Hokkaidou)' },
+  '人': { primary:'kun', kun:'hito', on:'jin / nin', examples:'日本人 (nihonjin) Japanese person · 三人 (sannin) 3 people' },
+  '山': { primary:'kun', kun:'yama', on:'san / zan', examples:'富士山 (Fujisan) Mt. Fuji · 火山 (kazan) volcano' },
+  '日': { primary:'kun', kun:'hi / bi', on:'nichi / jitsu', examples:'日本 (nihon) Japan · 日曜日 (nichiyoubi) Sunday' },
+  '大': { primary:'kun', kun:'oo', on:'dai / tai', examples:'大学 (daigaku) university · 大会 (taikai) tournament' },
+  '小': { primary:'kun', kun:'ko / chii', on:'shou', examples:'小学校 (shougakkou) elementary school · 小説 (shousetsu) novel' },
+  '学': { primary:'on',  kun:'mana', on:'gaku', examples:'大学 (daigaku) university · 学校 (gakkou) school · 学生 (gakusei) student' },
+  '国': { primary:'kun', kun:'kuni', on:'koku', examples:'中国 (chuugoku) China · 外国 (gaikoku) foreign country' },
+  '食': { primary:'kun', kun:'ta / ku', on:'shoku', examples:'朝食 (choushoku) breakfast · 食堂 (shokudou) cafeteria' },
+  '水': { primary:'kun', kun:'mizu', on:'sui', examples:'水曜日 (suiyoubi) Wednesday · 水道 (suidou) tap water' },
+  '見': { primary:'kun', kun:'mi', on:'ken', examples:'意見 (iken) opinion · 発見 (hakken) discovery' },
+  '来': { primary:'kun', kun:'ki / ku', on:'rai', examples:'来年 (rainen) next year · 未来 (mirai) future' },
+  '時': { primary:'on',  kun:'toki', on:'ji', examples:'三時 (sanji) 3 o’clock · 時間 (jikan) time' },
+  '新': { primary:'on',  kun:'atara', on:'shin', examples:'新幹線 (shinkansen) bullet train · 新聞 (shinbun) newspaper' },
+  '東': { primary:'on',  kun:'higashi', on:'tou', examples:'東京 (Toukyou) Tokyo · 東洋 (touyou) the Orient' },
+  '京': { primary:'on',  kun:'(rare alone)', on:'kyou / kei', examples:'東京 (Toukyou) · 京都 (Kyouto) · 上京 (joukyou) going to Tokyo' },
+  '会': { primary:'on',  kun:'a', on:'kai', examples:'大会 (taikai) tournament · 会社 (kaisha) company · 会議 (kaigi) meeting' },
+  '車': { primary:'kun', kun:'kuruma', on:'sha', examples:'電車 (densha) train · 自転車 (jitensha) bicycle' },
+  '気': { primary:'on',  kun:'(rare alone)', on:'ki / ke', examples:'元気 (genki) energy · 天気 (tenki) weather · 病気 (byouki) sickness' },
+  '今': { primary:'kun', kun:'ima', on:'kon / kin', examples:'今月 (kongetsu) this month · 今度 (kondo) next time' },
+  '私': { primary:'kun', kun:'watashi', on:'shi', examples:'私立 (shiritsu) private (school) · 私服 (shifuku) plain clothes' },
+  '飲': { primary:'kun', kun:'no', on:'in', examples:'飲料 (inryou) beverage · 飲食 (inshoku) food and drink' },
+  '駅': { primary:'on',  kun:'(none common)', on:'eki', examples:'東京駅 (Toukyou-eki) Tokyo Station · 駅前 (ekimae) station front' },
+  '右': { primary:'kun', kun:'migi', on:'u / yuu', examples:'右翼 (uyoku) right wing · 左右 (sayuu) left and right' },
+  '何': { primary:'kun', kun:'nani / nan', on:'ka', examples:'何時 (nanji) what time · 何か (nanika) something' },
+  '名': { primary:'kun', kun:'na', on:'mei / myou', examples:'名前 (namae) name · 有名 (yuumei) famous' },
+  '次': { primary:'kun', kun:'tsugi', on:'ji', examples:'次回 (jikai) next time · 目次 (mokuji) table of contents' },
+  '行': { primary:'kun', kun:'i / yu / okona', on:'kou / gyou', examples:'銀行 (ginkou) bank · 旅行 (ryokou) travel · 行動 (koudou) action' },
+  '生': { primary:'on',  kun:'i / nama / u', on:'sei / shou', examples:'先生 (sensei) teacher · 学生 (gakusei) student · 一生 (isshou) entire life' },
+  '上': { primary:'kun', kun:'ue / nobo / kami', on:'jou', examples:'上手 (jouzu) skilled · 屋上 (okujou) rooftop · 上京 (joukyou)' },
+  '下': { primary:'kun', kun:'shita / kuda', on:'ka / ge', examples:'下手 (heta) unskilled · 地下 (chika) underground' },
+  '水': { primary:'kun', kun:'mizu', on:'sui', examples:'水曜日 (suiyoubi) Wednesday · 水道 (suidou) tap water' },
+  '火': { primary:'kun', kun:'hi', on:'ka', examples:'火曜日 (kayoubi) Tuesday · 火山 (kazan) volcano' },
+  '月': { primary:'on',  kun:'tsuki', on:'getsu / gatsu', examples:'月曜日 (getsuyoubi) Monday · 一月 (ichigatsu) January · 今月 (kongetsu)' },
+  '木': { primary:'kun', kun:'ki', on:'moku / boku', examples:'木曜日 (mokuyoubi) Thursday · 木材 (mokuzai) wood' },
+  '金': { primary:'kun', kun:'kane', on:'kin / kon', examples:'金曜日 (kinyoubi) Friday · 現金 (genkin) cash · お金 (okane) money' },
+  '土': { primary:'kun', kun:'tsuchi', on:'do / to', examples:'土曜日 (doyoubi) Saturday · 土地 (tochi) land' }
+};
+
+/* ============================================================
+   STATE + UTILITIES
+   ============================================================ */
+let currentArticle = ARTICLES[0];
+let currentScenario = null;
+let currentNodeId = null;
+let dialogueHistory = [];
+let speechRate = 0.85;
+let jaVoice = null;
+let speakingTokenEl = null;
+
+function pickJapaneseVoice() {
+  if (!('speechSynthesis' in window)) return null;
+  const voices = window.speechSynthesis.getVoices();
+  return voices.find(v => v.lang === 'ja-JP')
+      || voices.find(v => v.lang && v.lang.startsWith('ja'))
+      || null;
+}
+
+function speak(text, onStart, onEnd) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ja-JP';
+  u.rate = speechRate;
+  if (jaVoice) u.voice = jaVoice;
+  if (onStart) u.onstart = onStart;
+  if (onEnd) u.onend = onEnd;
+  window.speechSynthesis.speak(u);
+}
+
+function tokenToText(t) {
+  if (t.punct) return t.punct;
+  return t.base;
+}
+
+function sentenceText(s) {
+  return s.tokens.map(tokenToText).join('');
+}
+
+function articleText(a) {
+  return a.sentences.map(sentenceText).join(' ');
+}
+
+/* ============================================================
+   RENDERING — shared helpers
+   ============================================================ */
+function buildSentenceEl(tokens) {
+  const row = document.createElement('div');
+  row.className = 'sentence';
+  tokens.forEach((t) => {
+    if (t.punct) {
+      const p = document.createElement('span');
+      p.className = 'punct';
+      p.textContent = t.punct;
+      row.appendChild(p);
+      return;
+    }
+    const w = document.createElement('span');
+    w.className = 'word';
+
+    const literal = document.createElement('span');
+    literal.className = 'literal' + (t.literalRole === 'particle' ? ' particle-role' : '');
+    literal.textContent = t.literal || '';
+    w.appendChild(literal);
+
+    const romaji = document.createElement('span');
+    romaji.className = 'romaji';
+    romaji.textContent = t.romaji || '';
+    w.appendChild(romaji);
+
+    const kana = document.createElement('span');
+    kana.className = 'kana' + (t.kana ? '' : ' empty');
+    kana.textContent = t.kana || '·';
+    w.appendChild(kana);
+
+    const base = document.createElement('span');
+    base.className = 'base ' + (t.script || 'kanji');
+    base.textContent = t.base;
+    w.appendChild(base);
+
+    w.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.word.selected').forEach(el => el.classList.remove('selected'));
+      w.classList.add('selected');
+      openDetail(t);
+    });
+    row.appendChild(w);
+  });
+  return row;
+}
+
+function tokensToText(tokens) {
+  return tokens.map(t => t.punct || t.base).join('');
+}
+
+function renderArticle(article) {
+  const body = document.getElementById('article-body');
+  body.innerHTML = '';
+
+  const h2 = document.createElement('h2');
+  h2.innerHTML = article.title + '<span class="en-title">' + article.titleEn + '</span>';
+  body.appendChild(h2);
+
+  article.sentences.forEach((sentence) => {
+    const sentenceWrap = document.createElement('div');
+
+    const actions = document.createElement('div');
+    actions.className = 'sentence-actions';
+    const playBtn = document.createElement('button');
+    playBtn.className = 'sentence-play';
+    playBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> play sentence';
+    playBtn.addEventListener('click', () => speak(sentenceText(sentence)));
+    actions.appendChild(playBtn);
+    sentenceWrap.appendChild(actions);
+
+    sentenceWrap.appendChild(buildSentenceEl(sentence.tokens));
+
+    const gloss = document.createElement('div');
+    gloss.className = 'gloss';
+    gloss.textContent = sentence.gloss;
+    sentenceWrap.appendChild(gloss);
+
+    body.appendChild(sentenceWrap);
+  });
+
+  document.getElementById('audio-title').textContent = article.title;
+  document.getElementById('audio-sub').textContent = article.titleEn;
+}
+
+/* ============================================================
+   CONVERSATION MODE
+   ============================================================ */
+function renderScenarioCards() {
+  const wrap = document.getElementById('scenario-cards');
+  wrap.innerHTML = '';
+  SCENARIOS.forEach(s => {
+    const card = document.createElement('button');
+    card.className = 'scenario-card' + (currentScenario && currentScenario.id === s.id ? ' active' : '');
+    card.innerHTML =
+      '<span class="emoji">' + s.emoji + '</span>' +
+      '<div class="name">' + s.name + '</div>' +
+      '<div class="name-jp">' + s.nameJp + '</div>';
+    card.addEventListener('click', () => startScenario(s.id));
+    wrap.appendChild(card);
+  });
+}
+
+function startScenario(scenarioId) {
+  currentScenario = SCENARIOS.find(s => s.id === scenarioId);
+  if (!currentScenario) return;
+  currentNodeId = currentScenario.start;
+  dialogueHistory = [];
+  document.getElementById('scenario-setting').textContent = currentScenario.setting;
+  document.getElementById('scenario-detail').style.display = 'block';
+  renderScenarioCards();
+  advanceTo(currentScenario.start);
+}
+
+function advanceTo(nodeId) {
+  currentNodeId = nodeId;
+  const node = currentScenario.nodes[nodeId];
+  if (!node) return;
+  // Show the node unless it's a silent "you-prompt" with no tokens (just a chooser)
+  if (node.tokens && node.tokens.length > 0) {
+    dialogueHistory.push({ speaker: node.speaker, tokens: node.tokens, gloss: node.gloss });
+  }
+  renderDialogue();
+  if (node.next && !node.choices) {
+    setTimeout(() => advanceTo(node.next), 450);
+  }
+}
+
+function pickChoice(choiceIdx) {
+  const node = currentScenario.nodes[currentNodeId];
+  const choice = node.choices[choiceIdx];
+  dialogueHistory.push({ speaker: 'you', tokens: choice.tokens, gloss: choice.gloss });
+  renderDialogue();
+  setTimeout(() => advanceTo(choice.next), 350);
+}
+
+function renderDialogue() {
+  const wrap = document.getElementById('dialogue');
+  wrap.innerHTML = '';
+
+  // Render every bubble in history
+  dialogueHistory.forEach(line => {
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble ' + (line.speaker === 'you' ? 'you' : 'host');
+
+    const speaker = document.createElement('div');
+    speaker.className = 'bubble-speaker';
+    const label = document.createElement('span');
+    label.textContent = line.speaker === 'you' ? 'you' : 'staff';
+    speaker.appendChild(label);
+
+    const playBtn = document.createElement('button');
+    playBtn.className = 'sentence-play';
+    playBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> hear';
+    playBtn.addEventListener('click', () => speak(tokensToText(line.tokens)));
+    speaker.appendChild(playBtn);
+
+    bubble.appendChild(speaker);
+    bubble.appendChild(buildSentenceEl(line.tokens));
+
+    if (line.gloss) {
+      const gloss = document.createElement('div');
+      gloss.className = 'gloss';
+      gloss.textContent = line.gloss;
+      bubble.appendChild(gloss);
+    }
+    wrap.appendChild(bubble);
+  });
+
+  // Show choices or end card if we're at a decision/end point
+  const node = currentScenario && currentScenario.nodes[currentNodeId];
+  if (!node) return;
+
+  if (node.choices) {
+    const choiceWrap = document.createElement('div');
+    choiceWrap.className = 'choices-wrap';
+    const header = document.createElement('div');
+    header.className = 'choices-header';
+    header.textContent = 'Your turn';
+    choiceWrap.appendChild(header);
+
+    const choices = document.createElement('div');
+    choices.className = 'choices';
+    node.choices.forEach((c, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'choice';
+      btn.innerHTML =
+        '<div class="choice-en">' + c.gloss + '</div>' +
+        '<div class="choice-jp">' + tokensToText(c.tokens) + '</div>';
+      btn.addEventListener('click', () => pickChoice(idx));
+      choices.appendChild(btn);
+    });
+    choiceWrap.appendChild(choices);
+    wrap.appendChild(choiceWrap);
+  } else if (node.end) {
+    const end = document.createElement('div');
+    end.className = 'scenario-end';
+    end.innerHTML =
+      '<div class="end-jp">お疲れさま！</div>' +
+      '<div>' + node.end + '</div>' +
+      '<button id="restart-scenario">Try another scenario</button>';
+    wrap.appendChild(end);
+    document.getElementById('restart-scenario').addEventListener('click', () => {
+      document.getElementById('scenario-detail').style.display = 'none';
+      currentScenario = null;
+      currentNodeId = null;
+      dialogueHistory = [];
+      renderScenarioCards();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // Scroll latest bubble into view
+  setTimeout(() => {
+    const last = wrap.lastElementChild;
+    if (last) last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+}
+
+function switchMode(mode) {
+  document.querySelectorAll('#mode-toggle button').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  document.getElementById('view-article').classList.toggle('active', mode === 'article');
+  document.getElementById('view-conversation').classList.toggle('active', mode === 'conversation');
+  document.getElementById('view-kana').classList.toggle('active', mode === 'kana');
+  document.getElementById('view-drill').classList.toggle('active', mode === 'drill');
+  closeDetail();
+  if (mode === 'conversation') renderScenarioCards();
+  if (mode === 'kana') renderKanaChart();
+  if (mode === 'drill' && !drillState.current) startDrill();
+}
+
+/* ============================================================
+   DRILL MODE
+   ============================================================ */
+const drillState = {
+  settings: { script:'hiragana', level:'basic' },
+  pool: [],
+  recent: [],
+  misses: {},
+  current: null,
+  score: { correct:0, total:0 },
+  streak: 0,
+  bestStreak: 0,
+  locked: false
+};
+
+function buildDrillPool() {
+  const { script, level } = drillState.settings;
+  let rows = [...KANA_BASIC];
+  if (level === 'voiced' || level === 'all') rows = rows.concat(KANA_DAKUTEN, KANA_HANDAKUTEN);
+  if (level === 'all') rows = rows.concat(KANA_YOUON);
+  const pool = [];
+  rows.forEach(row => row.cells.forEach(cell => {
+    if (!cell) return;
+    if (script === 'hiragana' || script === 'both')
+      pool.push({ display: cell.h, romaji: cell.r, script: 'hiragana' });
+    if (script === 'katakana' || script === 'both')
+      pool.push({ display: cell.k, romaji: cell.r, script: 'katakana' });
+  }));
+  return pool;
+}
+
+function pickNextCard() {
+  const pool = drillState.pool;
+  const recentSet = new Set(drillState.recent);
+  let totalWeight = 0;
+  const weights = pool.map(card => {
+    const key = card.display + '|' + card.script;
+    if (recentSet.has(key)) return 0;
+    const missed = drillState.misses[key] || 0;
+    const w = 1 + missed * 2;
+    totalWeight += w;
+    return w;
+  });
+  if (totalWeight === 0) return pool[Math.floor(Math.random() * pool.length)];
+  let r = Math.random() * totalWeight;
+  for (let i = 0; i < pool.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return pool[i];
+  }
+  return pool[pool.length - 1];
+}
+
+function pickDistractors(card) {
+  const pool = drillState.pool;
+  const seen = new Set([card.romaji]);
+  const candidates = pool.filter(c => c.romaji !== card.romaji);
+  candidates.sort(() => Math.random() - 0.5);
+  const out = [];
+  for (const c of candidates) {
+    if (!seen.has(c.romaji)) {
+      seen.add(c.romaji);
+      out.push(c.romaji);
+      if (out.length === 3) break;
+    }
+  }
+  return out;
+}
+
+function renderDrillCard() {
+  const card = drillState.current;
+  const cardEl = document.getElementById('drill-card');
+  cardEl.className = 'drill-card ' + card.script;
+  cardEl.textContent = card.display;
+
+  const choices = [card.romaji, ...pickDistractors(card)].sort(() => Math.random() - 0.5);
+  const wrap = document.getElementById('drill-choices');
+  wrap.innerHTML = '';
+  choices.forEach(romaji => {
+    const b = document.createElement('button');
+    b.className = 'drill-choice';
+    b.textContent = romaji;
+    b.addEventListener('click', () => answerDrill(romaji, b));
+    wrap.appendChild(b);
+  });
+  drillState.locked = false;
+}
+
+function answerDrill(picked, btn) {
+  if (drillState.locked) return;
+  drillState.locked = true;
+  const card = drillState.current;
+  const correct = picked === card.romaji;
+  drillState.score.total++;
+  const cardEl = document.getElementById('drill-card');
+
+  if (correct) {
+    drillState.score.correct++;
+    drillState.streak++;
+    if (drillState.streak > drillState.bestStreak) drillState.bestStreak = drillState.streak;
+    btn.classList.add('correct');
+    cardEl.classList.add('flash-correct');
+  } else {
+    drillState.streak = 0;
+    const key = card.display + '|' + card.script;
+    drillState.misses[key] = (drillState.misses[key] || 0) + 1;
+    btn.classList.add('wrong');
+    document.querySelectorAll('.drill-choice').forEach(b => {
+      if (b.textContent === card.romaji) b.classList.add('correct');
+    });
+    cardEl.classList.add('flash-wrong');
+  }
+  document.querySelectorAll('.drill-choice').forEach(b => b.disabled = true);
+  speak(card.display);
+  updateDrillStats();
+
+  setTimeout(() => {
+    cardEl.classList.remove('flash-correct', 'flash-wrong');
+    drillState.recent.push(card.display + '|' + card.script);
+    if (drillState.recent.length > 6) drillState.recent.shift();
+    drillState.current = pickNextCard();
+    renderDrillCard();
+    renderDrillRecap();
+  }, correct ? 650 : 1400);
+}
+
+function updateDrillStats() {
+  const s = drillState.score;
+  document.getElementById('drill-score').textContent = s.correct + '/' + s.total;
+  document.getElementById('drill-acc').textContent = s.total === 0 ? '—' : Math.round(100 * s.correct / s.total) + '%';
+  document.getElementById('drill-streak').textContent = drillState.streak;
+  document.getElementById('drill-best').textContent = drillState.bestStreak;
+}
+
+function renderDrillRecap() {
+  const recap = document.getElementById('drill-recap');
+  const entries = Object.entries(drillState.misses)
+    .filter(([_, count]) => count > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8);
+  if (entries.length === 0) { recap.style.display = 'none'; return; }
+  recap.style.display = 'block';
+  recap.innerHTML =
+    '<div>tripping you up most:</div>' +
+    '<div class="miss-list">' +
+      entries.map(([key, count]) => {
+        const display = key.split('|')[0];
+        return '<span class="miss-chip">' + display + ' ×' + count + '</span>';
+      }).join('') +
+    '</div>';
+}
+
+function startDrill() {
+  drillState.pool = buildDrillPool();
+  drillState.recent = [];
+  drillState.misses = {};
+  drillState.score = { correct:0, total:0 };
+  drillState.streak = 0;
+  drillState.bestStreak = 0;
+  drillState.current = pickNextCard();
+  renderDrillCard();
+  updateDrillStats();
+  renderDrillRecap();
+}
+
+/* ============================================================
+   KANA CHART
+   ============================================================ */
+function renderKanaChart() {
+  const root = document.getElementById('kana-chart');
+  if (root.dataset.rendered === '1') return; // render once, cells are static
+  root.innerHTML = '';
+  const groups = [
+    { title:'Basic 46 (gojuuon)',          sub:'The core sounds. Every Japanese word is built from these.',                       data:KANA_BASIC,     cols:5 },
+    { title:'Voiced (dakuten ゛)',         sub:'Two dots soften the consonant: k→g, s→z, t→d, h→b.',                              data:KANA_DAKUTEN,   cols:5 },
+    { title:'Semi-voiced (handakuten ゜)', sub:'A small circle turns h-row into p-row.',                                          data:KANA_HANDAKUTEN, cols:5 },
+    { title:'Combos (youon)',              sub:'Small ゃ / ゅ / ょ attach to an i-row kana to form a blended syllable.',           data:KANA_YOUON,     cols:3 }
+  ];
+  groups.forEach(g => {
+    const group = document.createElement('div');
+    group.className = 'kana-group';
+    const h3 = document.createElement('h3'); h3.textContent = g.title; group.appendChild(h3);
+    const sub = document.createElement('p'); sub.className = 'kana-group-sub'; sub.textContent = g.sub; group.appendChild(sub);
+
+    const grid = document.createElement('div');
+    grid.className = 'kana-grid' + (g.cols === 3 ? ' youon' : '');
+
+    g.data.forEach(row => {
+      const label = document.createElement('div');
+      label.className = 'kana-row-label';
+      label.textContent = row.label || '';
+      grid.appendChild(label);
+
+      let placed = 0;
+      row.cells.forEach(cell => {
+        if (!cell) {
+          const empty = document.createElement('div');
+          empty.className = 'kana-cell empty';
+          grid.appendChild(empty);
+        } else {
+          const c = document.createElement('button');
+          c.className = 'kana-cell';
+          const mn = KANA_MNEMONICS[cell.r];
+          c.innerHTML =
+            '<span class="h">' + cell.h + '</span>' +
+            '<span class="k">' + cell.k + '</span>' +
+            '<span class="r">' + cell.r + '</span>' +
+            (mn ? '<span class="mn">' + mn + '</span>' : '');
+          c.addEventListener('click', () => speak(cell.h));
+          grid.appendChild(c);
+        }
+        placed++;
+      });
+      while (placed < g.cols) {
+        const filler = document.createElement('div');
+        filler.className = 'kana-cell empty';
+        grid.appendChild(filler);
+        placed++;
+      }
+    });
+
+    group.appendChild(grid);
+    root.appendChild(group);
+  });
+  root.dataset.rendered = '1';
+}
+
+/* ============================================================
+   DETAIL PANEL
+   ============================================================ */
+function openDetail(token) {
+  const detail = document.getElementById('detail');
+  document.getElementById('detail-tag').textContent = (token.script || 'word');
+  const wrap = document.getElementById('detail-word');
+  wrap.innerHTML = '';
+
+  if (token.literal) {
+    const lit = document.createElement('span');
+    lit.className = 'literal-big' + (token.literalRole === 'particle' ? ' particle-role' : '');
+    lit.textContent = token.literal;
+    wrap.appendChild(lit);
+  }
+
+  const r = document.createElement('span');
+  r.className = 'romaji-big';
+  r.textContent = token.romaji || '';
+  wrap.appendChild(r);
+
+  const k = document.createElement('span');
+  k.className = 'kana-big' + (token.kana ? '' : ' empty');
+  k.textContent = token.kana || '';
+  wrap.appendChild(k);
+
+  const b = document.createElement('span');
+  b.className = 'base-big ' + (token.script || '');
+  b.textContent = token.base;
+  wrap.appendChild(b);
+
+  document.getElementById('detail-meaning').textContent = token.meaning || '';
+  document.getElementById('detail-pos').textContent = token.pos || '';
+
+  const breakdown = document.getElementById('char-breakdown');
+  breakdown.innerHTML = '';
+  const chars = (token.chars && token.chars.length) ? token.chars : (CHAR_BREAKDOWNS[token.base] || []);
+  if (chars.length) {
+    const h = document.createElement('h4');
+    h.textContent = 'Character breakdown';
+    breakdown.appendChild(h);
+    chars.forEach(c => {
+      const row = document.createElement('div');
+      row.className = 'char-row';
+      row.innerHTML =
+        '<span class="ch ' + scriptOf(c.c) + '">' + c.c + '</span>' +
+        '<span class="sound">' + (c.s || '') + '</span>' +
+        '<span class="role">' + (c.r || '') + '</span>';
+      breakdown.appendChild(row);
+
+      // If this kanji has a famous secondary reading, surface it
+      if (scriptOf(c.c) === 'kanji' && KANJI_READINGS[c.c]) {
+        const k = KANJI_READINGS[c.c];
+        const currentSound = (c.s || '').toLowerCase();
+        const showingKun = currentSound.split(/[\s\/]+/).some(s => k.kun.toLowerCase().includes(s));
+        const otherLabel = showingKun ? 'on-yomi (compounds)' : 'kun-yomi (alone)';
+        const otherReading = showingKun ? k.on : k.kun;
+        const alt = document.createElement('div');
+        alt.className = 'char-alt';
+        alt.innerHTML =
+          '<span class="char-alt-icon">💡</span>' +
+          '<span class="char-alt-body">' +
+            '<strong>' + c.c + '</strong> is also pronounced <strong>' + otherReading + '</strong> as ' + otherLabel +
+            '<span class="char-alt-examples">' + k.examples + '</span>' +
+          '</span>';
+        breakdown.appendChild(alt);
+      }
+    });
+  }
+
+  document.getElementById('detail-play').onclick = () => speak(token.base);
+
+  detail.classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detail').classList.remove('open');
+  document.querySelectorAll('.word.selected').forEach(el => el.classList.remove('selected'));
+}
+
+function scriptOf(ch) {
+  if (!ch) return '';
+  const code = ch.charCodeAt(0);
+  if (code >= 0x3040 && code <= 0x309F) return 'hiragana';
+  if (code >= 0x30A0 && code <= 0x30FF) return 'katakana';
+  if (code >= 0x4E00 && code <= 0x9FFF) return 'kanji';
+  return '';
+}
+
+/* ============================================================
+   WIRING
+   ============================================================ */
+function init() {
+  // Article picker
+  const sel = document.getElementById('article-select');
+  ARTICLES.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.id;
+    opt.textContent = a.title + '  —  ' + a.titleEn;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', () => {
+    currentArticle = ARTICLES.find(a => a.id === sel.value);
+    renderArticle(currentArticle);
+    closeDetail();
+  });
+
+  // Play all
+  document.getElementById('play-all').addEventListener('click', () => {
+    speak(articleText(currentArticle));
+  });
+
+  // Speed
+  document.querySelectorAll('#speed-control button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#speed-control button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      speechRate = parseFloat(btn.dataset.rate);
+    });
+  });
+
+  // Toggles
+  document.querySelectorAll('.toggle').forEach(t => {
+    t.addEventListener('click', () => {
+      t.classList.toggle('on');
+      const key = t.dataset.toggle;
+      document.body.classList.toggle('no-' + key, !t.classList.contains('on'));
+    });
+  });
+
+  // Mode toggle
+  document.querySelectorAll('#mode-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+  });
+
+  // Drill settings + restart
+  document.querySelectorAll('.drill-pill button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const group = btn.parentElement.dataset.group;
+      btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      drillState.settings[group] = btn.dataset[group];
+      startDrill();
+    });
+  });
+  document.getElementById('drill-restart').addEventListener('click', startDrill);
+
+  // Detail close
+  document.getElementById('detail-close').addEventListener('click', closeDetail);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetail(); });
+
+  // Voice loading (Chromium loads them async)
+  if ('speechSynthesis' in window) {
+    jaVoice = pickJapaneseVoice();
+    window.speechSynthesis.onvoiceschanged = () => { jaVoice = pickJapaneseVoice(); };
+  }
+
+  renderArticle(currentArticle);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
