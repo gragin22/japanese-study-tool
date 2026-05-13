@@ -1007,6 +1007,61 @@
   }
   .drill-restart:hover { color: var(--accent); border-color: var(--accent); }
 
+  /* Typing input variant */
+  .drill-input-wrap {
+    display: flex;
+    gap: 10px;
+    max-width: 480px;
+    margin: 0 auto;
+    align-items: center;
+  }
+  .drill-input {
+    flex: 1;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    color: var(--ink);
+    text-align: center;
+    letter-spacing: .04em;
+    box-shadow: var(--shadow);
+    outline: none;
+    transition: all .15s;
+  }
+  .drill-input:focus { border-color: var(--accent); }
+  .drill-input.correct {
+    background: rgb(64, 180, 96);
+    color: white;
+    border-color: rgb(64, 180, 96);
+  }
+  .drill-input.wrong {
+    background: rgb(220, 60, 60);
+    color: white;
+    border-color: rgb(220, 60, 60);
+    font-size: 18px;
+  }
+  .drill-submit {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 18px 22px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform .15s;
+    font-family: inherit;
+  }
+  .drill-submit:hover { transform: translateY(-1px); }
+  .drill-submit:disabled { opacity: .4; cursor: default; }
+  @media (max-width: 540px) {
+    .drill-input { font-size: 20px; padding: 14px 16px; }
+    .drill-submit { padding: 14px 18px; font-size: 16px; }
+  }
+
   .drill-recap {
     background: var(--surface-2);
     border-radius: 12px;
@@ -1039,6 +1094,136 @@
     .drill-choice { padding: 16px 8px; font-size: 18px; }
     .drill-stats { gap: 16px; }
     .drill-stat strong { font-size: 18px; }
+  }
+
+  /* ===== Vocab mode ===== */
+  .vocab-nav {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+    padding: 12px 0;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+  .vocab-nav a {
+    text-decoration: none;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    transition: all .15s;
+  }
+  .vocab-nav a:hover { border-color: var(--accent); color: var(--accent); }
+
+  .vocab-category {
+    margin-bottom: 36px;
+    scroll-margin-top: 80px;
+  }
+  .vocab-category h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 14px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .vocab-category h3 .cat-emoji { font-size: 22px; }
+
+  .vocab-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .vocab-word-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+  .vocab-word-row .sentence { margin: 0; }
+  .vocab-word-meta {
+    flex: 1;
+    min-width: 180px;
+    padding-bottom: 6px;
+  }
+  .vocab-word-meta .meaning {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .vocab-word-meta .pos {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--ink-mute);
+    margin-top: 2px;
+  }
+  .vocab-word-play {
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 12px 6px 9px;
+    font-size: 11px;
+    color: var(--ink-mute);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all .15s;
+    align-self: center;
+  }
+  .vocab-word-play:hover { border-color: var(--accent); color: var(--accent); }
+  .vocab-word-play svg { width: 10px; height: 10px; }
+
+  .vocab-example {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--line);
+  }
+  .vocab-example-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--ink-mute);
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .vocab-example-label .vocab-example-play {
+    background: none;
+    border: none;
+    color: var(--ink-mute);
+    font-size: 11px;
+    cursor: pointer;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .vocab-example-label .vocab-example-play:hover { color: var(--accent); }
+  .vocab-example .gloss {
+    margin-top: 4px;
+  }
+
+  @media (max-width: 540px) {
+    .vocab-card { padding: 14px; }
+    .vocab-category h3 { font-size: 16px; }
   }
 
   /* ===== Alt reading hint under char breakdown rows ===== */
@@ -1086,6 +1271,7 @@
     <button data-mode="conversation">💬 Conversations</button>
     <button data-mode="kana">📖 Kana Chart</button>
     <button data-mode="drill">🎴 Drill</button>
+    <button data-mode="vocab">📚 Vocab</button>
   </div>
 
   <div class="toggles">
@@ -1099,7 +1285,10 @@
   <div class="view active" id="view-article">
     <div class="picker">
       <label for="article-select">Article</label>
-      <select id="article-select"></select>
+      <div style="display:flex; gap:8px; align-items:stretch;">
+        <select id="article-select" style="flex:1;"></select>
+        <button id="article-random" title="Surprise me with a random article" style="background:var(--accent); color:white; border:none; border-radius:10px; padding:0 16px; font-size:18px; cursor:pointer;">🎲</button>
+      </div>
     </div>
 
     <div class="audio-bar">
@@ -1137,6 +1326,12 @@
     <div id="kana-chart"></div>
   </div>
 
+  <!-- ========== VOCAB VIEW ========== -->
+  <div class="view" id="view-vocab">
+    <div class="vocab-nav" id="vocab-nav"></div>
+    <div id="vocab-list"></div>
+  </div>
+
   <!-- ========== DRILL VIEW ========== -->
   <div class="view" id="view-drill">
     <div class="drill-settings">
@@ -1150,6 +1345,10 @@
         <button data-level="voiced">+ voiced</button>
         <button data-level="all">all</button>
       </div>
+      <div class="drill-pill" data-group="mode">
+        <button class="active" data-mode="multiple">multiple choice</button>
+        <button data-mode="type">type the answer</button>
+      </div>
     </div>
 
     <div class="drill-stats">
@@ -1161,6 +1360,10 @@
 
     <div class="drill-card" id="drill-card">—</div>
     <div class="drill-choices" id="drill-choices"></div>
+    <div class="drill-input-wrap" id="drill-input-wrap" style="display:none;">
+      <input type="text" id="drill-input" class="drill-input" placeholder="type romaji..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
+      <button class="drill-submit" id="drill-submit">↵</button>
+    </div>
     <button class="drill-restart" id="drill-restart">↻ Reset session</button>
     <div class="drill-recap" id="drill-recap" style="display:none;"></div>
   </div>
@@ -1354,6 +1557,221 @@ const ARTICLES = [
               {c:"ま",s:"ma",r:"polite"},
               {c:"す",s:"su",r:"non-past polite ending"}
             ] },
+          { punct:"。" }
+        ]
+      }
+    ]
+  },
+
+  /* ---------- Article 4: Cherry blossom season ---------- */
+  {
+    id: "sample-4",
+    title: "桜の季節",
+    titleEn: "Cherry blossom season",
+    sentences: [
+      {
+        gloss: "Right now in Tokyo, the cherry blossoms are blooming.",
+        tokens: [
+          { base:"今", kana:"いま", romaji:"ima", literal:"now", script:"kanji", meaning:"now", pos:"noun" },
+          { punct:"、" },
+          { base:"東京", kana:"とうきょう", romaji:"toukyou", literal:"Tokyo", script:"kanji", meaning:"Tokyo", pos:"place name" },
+          { base:"で", kana:"", romaji:"de", literal:"in", literalRole:"particle", script:"particle", meaning:"location particle", pos:"particle" },
+          { base:"桜", kana:"さくら", romaji:"sakura", literal:"cherry-blossoms", script:"kanji", meaning:"cherry blossoms", pos:"noun" },
+          { base:"が", kana:"", romaji:"ga", literal:"[subj]", literalRole:"particle", script:"particle", meaning:"subject marker", pos:"particle" },
+          { base:"咲いています", kana:"さいています", romaji:"saiteimasu", literal:"is-blooming", script:"kanji", meaning:"are blooming (polite progressive)", pos:"verb" },
+          { punct:"。" }
+        ]
+      },
+      {
+        gloss: "Many people go flower-viewing.",
+        tokens: [
+          { base:"たくさん", kana:"", romaji:"takusan", literal:"many", script:"hiragana", meaning:"many", pos:"adverb" },
+          { base:"の", kana:"", romaji:"no", literal:"of", literalRole:"particle", script:"particle", meaning:"of / linking", pos:"particle" },
+          { base:"人", kana:"ひと", romaji:"hito", literal:"people", script:"kanji", meaning:"people", pos:"noun" },
+          { base:"が", kana:"", romaji:"ga", literal:"[subj]", literalRole:"particle", script:"particle", meaning:"subject marker", pos:"particle" },
+          { base:"お花見", kana:"おはなみ", romaji:"ohanami", literal:"flower-viewing", script:"kanji", meaning:"hanami / flower-viewing party", pos:"noun" },
+          { base:"を", kana:"", romaji:"o", literal:"[obj]", literalRole:"particle", script:"particle", meaning:"object marker", pos:"particle" },
+          { base:"します", kana:"", romaji:"shimasu", literal:"do", script:"hiragana", meaning:"do (polite)", pos:"verb" },
+          { punct:"。" }
+        ]
+      }
+    ]
+  },
+
+  /* ---------- Article 5: New ramen shop ---------- */
+  {
+    id: "sample-5",
+    title: "新しいラーメン屋",
+    titleEn: "A new ramen shop",
+    sentences: [
+      {
+        gloss: "Yesterday I went to a new ramen shop.",
+        tokens: [
+          { base:"昨日", kana:"きのう", romaji:"kinou", literal:"yesterday", script:"kanji", meaning:"yesterday", pos:"noun" },
+          { punct:"、" },
+          { base:"新しい", kana:"あたらしい", romaji:"atarashii", literal:"new", script:"kanji", meaning:"new", pos:"adjective" },
+          { base:"ラーメン屋", kana:"ラーメンや", romaji:"raamenya", literal:"ramen-shop", script:"katakana", meaning:"ramen shop", pos:"noun" },
+          { base:"に", kana:"", romaji:"ni", literal:"to", literalRole:"particle", script:"particle", meaning:"direction particle", pos:"particle" },
+          { base:"行きました", kana:"いきました", romaji:"ikimashita", literal:"went", script:"kanji", meaning:"went (polite past)", pos:"verb" },
+          { punct:"。" }
+        ]
+      },
+      {
+        gloss: "It was really delicious.",
+        tokens: [
+          { base:"とても", kana:"", romaji:"totemo", literal:"very", script:"hiragana", meaning:"very", pos:"adverb" },
+          { base:"美味しかった", kana:"おいしかった", romaji:"oishikatta", literal:"was-delicious", script:"kanji", meaning:"was delicious (past)", pos:"adjective" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is (polite)", pos:"copula" },
+          { punct:"。" }
+        ]
+      }
+    ]
+  },
+
+  /* ---------- Article 6: Train delay ---------- */
+  {
+    id: "sample-6",
+    title: "電車が遅れました",
+    titleEn: "The train was late",
+    sentences: [
+      {
+        gloss: "Today the train was late.",
+        tokens: [
+          { base:"今日", kana:"きょう", romaji:"kyou", literal:"today", script:"kanji", meaning:"today", pos:"noun" },
+          { punct:"、" },
+          { base:"電車", kana:"でんしゃ", romaji:"densha", literal:"train", script:"kanji", meaning:"train", pos:"noun" },
+          { base:"が", kana:"", romaji:"ga", literal:"[subj]", literalRole:"particle", script:"particle", meaning:"subject marker", pos:"particle" },
+          { base:"遅れました", kana:"おくれました", romaji:"okuremashita", literal:"was-late", script:"kanji", meaning:"was late (polite past)", pos:"verb" },
+          { punct:"。" }
+        ]
+      },
+      {
+        gloss: "I was late to the office.",
+        tokens: [
+          { base:"会社", kana:"かいしゃ", romaji:"kaisha", literal:"company", script:"kanji", meaning:"company / office", pos:"noun" },
+          { base:"に", kana:"", romaji:"ni", literal:"to", literalRole:"particle", script:"particle", meaning:"to (destination)", pos:"particle" },
+          { base:"遅れました", kana:"おくれました", romaji:"okuremashita", literal:"was-late", script:"kanji", meaning:"was late", pos:"verb" },
+          { punct:"。" }
+        ]
+      }
+    ]
+  },
+
+  /* ---------- Article 7: Mt. Fuji ---------- */
+  {
+    id: "sample-7",
+    title: "富士山",
+    titleEn: "Mt. Fuji",
+    sentences: [
+      {
+        gloss: "Mt. Fuji is the tallest mountain in Japan.",
+        tokens: [
+          { base:"富士山", kana:"ふじさん", romaji:"fujisan", literal:"Mt-Fuji", script:"kanji", meaning:"Mount Fuji", pos:"place name" },
+          { base:"は", kana:"", romaji:"wa", literal:"[topic]", literalRole:"particle", script:"particle", meaning:"topic marker", pos:"particle" },
+          { base:"日本", kana:"にほん", romaji:"nihon", literal:"Japan", script:"kanji", meaning:"Japan", pos:"place name" },
+          { base:"で", kana:"", romaji:"de", literal:"in", literalRole:"particle", script:"particle", meaning:"location particle", pos:"particle" },
+          { base:"一番", kana:"いちばん", romaji:"ichiban", literal:"number-one", script:"kanji", meaning:"the most / number one", pos:"adverb" },
+          { base:"高い", kana:"たかい", romaji:"takai", literal:"tall", script:"kanji", meaning:"tall / high", pos:"adjective" },
+          { base:"山", kana:"やま", romaji:"yama", literal:"mountain", script:"kanji", meaning:"mountain", pos:"noun" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is (polite)", pos:"copula" },
+          { punct:"。" }
+        ]
+      },
+      {
+        gloss: "It’s really beautiful.",
+        tokens: [
+          { base:"とても", kana:"", romaji:"totemo", literal:"very", script:"hiragana", meaning:"very", pos:"adverb" },
+          { base:"綺麗", kana:"きれい", romaji:"kirei", literal:"beautiful", script:"kanji", meaning:"beautiful / pretty", pos:"adjective" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is", pos:"copula" },
+          { punct:"。" }
+        ]
+      }
+    ]
+  },
+
+  /* ---------- Article 8: Rainy day ---------- */
+  {
+    id: "sample-8",
+    title: "雨の日",
+    titleEn: "A rainy day",
+    sentences: [
+      {
+        gloss: "It’s raining today.",
+        tokens: [
+          { base:"今日", kana:"きょう", romaji:"kyou", literal:"today", script:"kanji", meaning:"today", pos:"noun" },
+          { base:"は", kana:"", romaji:"wa", literal:"[topic]", literalRole:"particle", script:"particle", meaning:"topic marker", pos:"particle" },
+          { base:"雨", kana:"あめ", romaji:"ame", literal:"rain", script:"kanji", meaning:"rain", pos:"noun" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is (polite)", pos:"copula" },
+          { punct:"。" }
+        ]
+      },
+      {
+        gloss: "I’ll take an umbrella with me.",
+        tokens: [
+          { base:"傘", kana:"かさ", romaji:"kasa", literal:"umbrella", script:"kanji", meaning:"umbrella", pos:"noun" },
+          { base:"を", kana:"", romaji:"o", literal:"[obj]", literalRole:"particle", script:"particle", meaning:"object marker", pos:"particle" },
+          { base:"持って", kana:"もって", romaji:"motte", literal:"holding", script:"kanji", meaning:"hold (te-form connector)", pos:"verb" },
+          { base:"行きます", kana:"いきます", romaji:"ikimasu", literal:"go", script:"kanji", meaning:"go (polite)", pos:"verb" },
+          { punct:"。" }
+        ]
+      }
+    ]
+  },
+
+  /* ---------- Article 9: New job ---------- */
+  {
+    id: "sample-9",
+    title: "新しい仕事",
+    titleEn: "A new job",
+    sentences: [
+      {
+        gloss: "Last month I started a new job.",
+        tokens: [
+          { base:"先月", kana:"せんげつ", romaji:"sengetsu", literal:"last-month", script:"kanji", meaning:"last month", pos:"noun" },
+          { punct:"、" },
+          { base:"新しい", kana:"あたらしい", romaji:"atarashii", literal:"new", script:"kanji", meaning:"new", pos:"adjective" },
+          { base:"仕事", kana:"しごと", romaji:"shigoto", literal:"job", script:"kanji", meaning:"job / work", pos:"noun" },
+          { base:"を", kana:"", romaji:"o", literal:"[obj]", literalRole:"particle", script:"particle", meaning:"object marker", pos:"particle" },
+          { base:"始めました", kana:"はじめました", romaji:"hajimemashita", literal:"started", script:"kanji", meaning:"started (polite past)", pos:"verb" },
+          { punct:"。" }
+        ]
+      },
+      {
+        gloss: "It’s really fun.",
+        tokens: [
+          { base:"とても", kana:"", romaji:"totemo", literal:"very", script:"hiragana", meaning:"very", pos:"adverb" },
+          { base:"楽しい", kana:"たのしい", romaji:"tanoshii", literal:"fun", script:"kanji", meaning:"fun / enjoyable", pos:"adjective" },
+          { base:"です", kana:"", romaji:"desu", literal:"is", script:"hiragana", meaning:"is (polite)", pos:"copula" },
+          { punct:"。" }
+        ]
+      }
+    ]
+  },
+
+  /* ---------- Article 10: Summer festival ---------- */
+  {
+    id: "sample-10",
+    title: "夏のお祭り",
+    titleEn: "A summer festival",
+    sentences: [
+      {
+        gloss: "There’s a big festival in the summer.",
+        tokens: [
+          { base:"夏", kana:"なつ", romaji:"natsu", literal:"summer", script:"kanji", meaning:"summer", pos:"noun" },
+          { base:"に", kana:"", romaji:"ni", literal:"in", literalRole:"particle", script:"particle", meaning:"in (time)", pos:"particle" },
+          { base:"大きい", kana:"おおきい", romaji:"ookii", literal:"big", script:"kanji", meaning:"big / large", pos:"adjective" },
+          { base:"お祭り", kana:"おまつり", romaji:"omatsuri", literal:"festival", script:"kanji", meaning:"festival (polite)", pos:"noun" },
+          { base:"が", kana:"", romaji:"ga", literal:"[subj]", literalRole:"particle", script:"particle", meaning:"subject marker", pos:"particle" },
+          { base:"あります", kana:"", romaji:"arimasu", literal:"exists", script:"hiragana", meaning:"there is (polite)", pos:"verb" },
+          { punct:"。" }
+        ]
+      },
+      {
+        gloss: "We watch fireworks.",
+        tokens: [
+          { base:"花火", kana:"はなび", romaji:"hanabi", literal:"fireworks", script:"kanji", meaning:"fireworks", pos:"noun" },
+          { base:"を", kana:"", romaji:"o", literal:"[obj]", literalRole:"particle", script:"particle", meaning:"object marker", pos:"particle" },
+          { base:"見ます", kana:"みます", romaji:"mimasu", literal:"watch", script:"kanji", meaning:"see / watch (polite)", pos:"verb" },
           { punct:"。" }
         ]
       }
@@ -2054,8 +2472,446 @@ const CHAR_BREAKDOWNS = {
     {c:"探",s:"saga",r:"search"},{c:"し",s:"shi",r:"stem"},
     {c:"て",s:"te",r:"connector"},{c:"い",s:"i",r:"be"},
     {c:"ま",s:"ま"},{c:"す",s:"su",r:"-ing form: 'am searching'"}
-  ]
+  ],
+
+  /* ----- additions for articles 4-10 ----- */
+  "桜": [{c:"桜",s:"sakura",r:"cherry blossom"}],
+  "咲いています": [
+    {c:"咲",s:"sa",r:"to bloom"},{c:"い",s:"i",r:"verb stem"},
+    {c:"て",s:"te",r:"connector"},{c:"い",s:"i",r:"be"},
+    {c:"ま",s:"ma"},{c:"す",s:"su",r:"-ing form: 'is blooming'"}
+  ],
+  "お花見": [
+    {c:"お",s:"o",r:"polite prefix"},
+    {c:"花",s:"hana",r:"flower"},
+    {c:"見",s:"mi",r:"viewing — together: hanami"}
+  ],
+  "昨日": [{c:"昨",s:"ki",r:"previous"},{c:"日",s:"nou",r:"day — together: yesterday"}],
+  "新しい": [
+    {c:"新",s:"atara",r:"new"},
+    {c:"し",s:"shi"},{c:"い",s:"i",r:"adjective ending"}
+  ],
+  "ラーメン屋": [
+    {c:"ラ",s:"ra"},{c:"ー",s:"—",r:"long vowel"},{c:"メ",s:"me"},{c:"ン",s:"n"},
+    {c:"屋",s:"ya",r:"shop / building suffix"}
+  ],
+  "行きました": [
+    {c:"行",s:"i",r:"go"},{c:"き",s:"ki",r:"verb stem"},
+    {c:"ま",s:"ma"},{c:"し",s:"shi",r:"past"},{c:"た",s:"ta",r:"past polite"}
+  ],
+  "行きます": [
+    {c:"行",s:"i",r:"go"},{c:"き",s:"ki",r:"verb stem"},
+    {c:"ま",s:"ma"},{c:"す",s:"su",r:"non-past polite"}
+  ],
+  "とても": [{c:"と",s:"to"},{c:"て",s:"te"},{c:"も",s:"mo",r:"together: very"}],
+  "美味しかった": [
+    {c:"美",s:"oi",r:"beautiful (here: tasty)"},
+    {c:"味",s:"shi",r:"flavor"},
+    {c:"し",s:"shi"},{c:"か",s:"ka"},{c:"っ",s:"(small tsu)",r:"doubles next consonant"},
+    {c:"た",s:"ta",r:"past adjective ending"}
+  ],
+  "電車": [{c:"電",s:"den",r:"electric"},{c:"車",s:"sha",r:"vehicle"}],
+  "遅れました": [
+    {c:"遅",s:"oku",r:"late / slow"},{c:"れ",s:"re",r:"verb stem"},
+    {c:"ま",s:"ma"},{c:"し",s:"shi",r:"past"},{c:"た",s:"ta",r:"past polite"}
+  ],
+  "会社": [{c:"会",s:"kai",r:"meeting / gathering"},{c:"社",s:"sha",r:"company / shrine"}],
+  "富士山": [
+    {c:"富",s:"fu",r:"wealth"},
+    {c:"士",s:"ji",r:"samurai / scholar"},
+    {c:"山",s:"san",r:"mountain — together: Mt. Fuji"}
+  ],
+  "日本": [{c:"日",s:"ni",r:"sun"},{c:"本",s:"hon",r:"origin — together: Japan"}],
+  "一番": [{c:"一",s:"ichi",r:"one"},{c:"番",s:"ban",r:"number — together: number one / most"}],
+  "高い": [{c:"高",s:"taka",r:"tall / expensive"},{c:"い",s:"i",r:"adjective ending"}],
+  "山": [{c:"山",s:"yama",r:"mountain"}],
+  "綺麗": [{c:"綺",s:"ki",r:"thread / fine"},{c:"麗",s:"rei",r:"beautiful — together: pretty"}],
+  "雨": [{c:"雨",s:"ame",r:"rain"}],
+  "傘": [{c:"傘",s:"kasa",r:"umbrella"}],
+  "持って": [
+    {c:"持",s:"mo",r:"hold"},{c:"っ",s:"(small tsu)",r:"doubles next consonant"},
+    {c:"て",s:"te",r:"connector — 'holding and...'"}
+  ],
+  "先月": [{c:"先",s:"sen",r:"previous"},{c:"月",s:"getsu",r:"month — together: last month"}],
+  "仕事": [{c:"仕",s:"shi",r:"serving"},{c:"事",s:"goto",r:"thing — together: work / job"}],
+  "始めました": [
+    {c:"始",s:"haji",r:"begin"},{c:"め",s:"me",r:"verb stem"},
+    {c:"ま",s:"ma"},{c:"し",s:"shi",r:"past"},{c:"た",s:"ta",r:"past polite"}
+  ],
+  "楽しい": [{c:"楽",s:"tano",r:"comfort / fun"},{c:"し",s:"shi"},{c:"い",s:"i",r:"adjective ending"}],
+  "夏": [{c:"夏",s:"natsu",r:"summer"}],
+  "大きい": [{c:"大",s:"oo",r:"big"},{c:"き",s:"ki"},{c:"い",s:"i",r:"adjective ending"}],
+  "お祭り": [
+    {c:"お",s:"o",r:"polite prefix"},
+    {c:"祭",s:"matsu",r:"festival"},{c:"り",s:"ri",r:"noun-forming suffix"}
+  ],
+  "花火": [{c:"花",s:"hana",r:"flower"},{c:"火",s:"bi",r:"fire — together: fireworks"}],
+  "見ます": [{c:"見",s:"mi",r:"see / watch"},{c:"ま",s:"ma"},{c:"す",s:"su",r:"polite"}]
 };
+
+/* ============================================================
+   VOCAB — 50 common travel words, organized by category.
+   Each word has one example sentence with full breakdown.
+   ============================================================ */
+const TT_WA = { base:'は', kana:'', romaji:'wa', literal:'[topic]', literalRole:'particle', script:'particle', meaning:'topic marker', pos:'particle' };
+const TT_GA = { base:'が', kana:'', romaji:'ga', literal:'[subj]', literalRole:'particle', script:'particle', meaning:'subject marker', pos:'particle' };
+const TT_O  = { base:'を', kana:'', romaji:'o', literal:'[obj]', literalRole:'particle', script:'particle', meaning:'object marker', pos:'particle' };
+const TT_NI = { base:'に', kana:'', romaji:'ni', literal:'to', literalRole:'particle', script:'particle', meaning:'to / at / in', pos:'particle' };
+const TT_DE = { base:'で', kana:'', romaji:'de', literal:'with', literalRole:'particle', script:'particle', meaning:'with / by means of', pos:'particle' };
+const TT_NO = { base:'の', kana:'', romaji:'no', literal:'of', literalRole:'particle', script:'particle', meaning:'of / linking', pos:'particle' };
+const TT_KA = { base:'か', kana:'', romaji:'ka', literal:'?', literalRole:'particle', script:'particle', meaning:'question marker', pos:'particle' };
+const TT_DESU = { base:'です', kana:'', romaji:'desu', literal:'is', script:'hiragana', meaning:'is (polite)', pos:'copula' };
+const TT_KUDASAI = { base:'ください', kana:'', romaji:'kudasai', literal:'please', script:'hiragana', meaning:'please give', pos:'verb' };
+const TT_ONEGAI = { base:'お願いします', kana:'おねがいします', romaji:'onegaishimasu', literal:'please', script:'kanji', meaning:'please (formal request)', pos:'set phrase' };
+const TT_DOKO = { base:'どこ', kana:'', romaji:'doko', literal:'where', script:'hiragana', meaning:'where', pos:'pronoun' };
+const TT_NANJI = { base:'何時', kana:'なんじ', romaji:'nanji', literal:'what-time', script:'kanji', meaning:'what time', pos:'noun' };
+const PUNCT_Q = { punct:'？' };
+const PUNCT_P = { punct:'。' };
+const PUNCT_C = { punct:'、' };
+const PUNCT_EX = { punct:'！' };
+
+const VOCAB = [
+  { id:'airport', emoji:'🛂', name:'At the Airport', words:[
+    { base:'空港', kana:'くうこう', romaji:'kuukou', literal:'airport', script:'kanji', meaning:'airport', pos:'noun',
+      example:{ gloss:'Where is the airport?', tokens:[
+        { base:'空港', kana:'くうこう', romaji:'kuukou', literal:'airport', script:'kanji', meaning:'airport', pos:'noun' },
+        TT_WA, TT_DOKO, TT_DESU, TT_KA, PUNCT_Q
+      ]}},
+    { base:'パスポート', kana:'', romaji:'pasupooto', literal:'passport', script:'katakana', meaning:'passport (loanword)', pos:'noun',
+      example:{ gloss:'Passport, please.', tokens:[
+        { base:'パスポート', kana:'', romaji:'pasupooto', literal:'passport', script:'katakana', meaning:'passport', pos:'noun' },
+        TT_O, TT_ONEGAI, PUNCT_P
+      ]}},
+    { base:'飛行機', kana:'ひこうき', romaji:'hikouki', literal:'airplane', script:'kanji', meaning:'airplane', pos:'noun',
+      example:{ gloss:'What time is the plane?', tokens:[
+        { base:'飛行機', kana:'ひこうき', romaji:'hikouki', literal:'airplane', script:'kanji', meaning:'airplane', pos:'noun' },
+        TT_WA, TT_NANJI, TT_DESU, TT_KA, PUNCT_Q
+      ]}},
+    { base:'切符', kana:'きっぷ', romaji:'kippu', literal:'ticket', script:'kanji', meaning:'ticket', pos:'noun',
+      example:{ gloss:'I’ll buy a ticket.', tokens:[
+        { base:'切符', kana:'きっぷ', romaji:'kippu', literal:'ticket', script:'kanji', meaning:'ticket', pos:'noun' },
+        TT_O,
+        { base:'買います', kana:'かいます', romaji:'kaimasu', literal:'buy', script:'kanji', meaning:'buy (polite)', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'荷物', kana:'にもつ', romaji:'nimotsu', literal:'luggage', script:'kanji', meaning:'luggage', pos:'noun',
+      example:{ gloss:'Where is the luggage?', tokens:[
+        { base:'荷物', kana:'にもつ', romaji:'nimotsu', literal:'luggage', script:'kanji', meaning:'luggage', pos:'noun' },
+        TT_WA, TT_DOKO, TT_DESU, TT_KA, PUNCT_Q
+      ]}}
+  ]},
+
+  { id:'train', emoji:'🚉', name:'Trains & Stations', words:[
+    { base:'駅', kana:'えき', romaji:'eki', literal:'station', script:'kanji', meaning:'train station', pos:'noun',
+      example:{ gloss:'I walk to the station.', tokens:[
+        { base:'駅', kana:'えき', romaji:'eki', literal:'station', script:'kanji', meaning:'station', pos:'noun' },
+        { base:'まで', kana:'', romaji:'made', literal:'to', literalRole:'particle', script:'particle', meaning:'until / to', pos:'particle' },
+        { base:'歩きます', kana:'あるきます', romaji:'arukimasu', literal:'walk', script:'kanji', meaning:'walk (polite)', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'電車', kana:'でんしゃ', romaji:'densha', literal:'train', script:'kanji', meaning:'train', pos:'noun',
+      example:{ gloss:'I get on the train.', tokens:[
+        { base:'電車', kana:'でんしゃ', romaji:'densha', literal:'train', script:'kanji', meaning:'train', pos:'noun' },
+        TT_NI,
+        { base:'乗ります', kana:'のります', romaji:'norimasu', literal:'board', script:'kanji', meaning:'get on / board (polite)', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'新幹線', kana:'しんかんせん', romaji:'shinkansen', literal:'bullet-train', script:'kanji', meaning:'bullet train', pos:'noun',
+      example:{ gloss:'I’ll go by bullet train.', tokens:[
+        { base:'新幹線', kana:'しんかんせん', romaji:'shinkansen', literal:'bullet-train', script:'kanji', meaning:'bullet train', pos:'noun' },
+        TT_DE,
+        { base:'行きます', kana:'いきます', romaji:'ikimasu', literal:'go', script:'kanji', meaning:'go (polite)', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'改札', kana:'かいさつ', romaji:'kaisatsu', literal:'ticket-gate', script:'kanji', meaning:'ticket gate', pos:'noun',
+      example:{ gloss:'The gate is over there.', tokens:[
+        { base:'改札', kana:'かいさつ', romaji:'kaisatsu', literal:'ticket-gate', script:'kanji', meaning:'ticket gate', pos:'noun' },
+        TT_WA,
+        { base:'あそこ', kana:'', romaji:'asoko', literal:'over-there', script:'hiragana', meaning:'over there', pos:'pronoun' },
+        TT_DESU, PUNCT_P
+      ]}},
+    { base:'ホーム', kana:'', romaji:'hoomu', literal:'platform', script:'katakana', meaning:'platform (from English)', pos:'noun',
+      example:{ gloss:'What number is the platform?', tokens:[
+        { base:'ホーム', kana:'', romaji:'hoomu', literal:'platform', script:'katakana', meaning:'platform', pos:'noun' },
+        TT_WA,
+        { base:'何番', kana:'なんばん', romaji:'nanban', literal:'what-number', script:'kanji', meaning:'what number', pos:'noun' },
+        TT_DESU, TT_KA, PUNCT_Q
+      ]}}
+  ]},
+
+  { id:'food', emoji:'🍱', name:'Food & Restaurants', words:[
+    { base:'レストラン', kana:'', romaji:'resutoran', literal:'restaurant', script:'katakana', meaning:'restaurant', pos:'noun',
+      example:{ gloss:'I’m going to a restaurant.', tokens:[
+        { base:'レストラン', kana:'', romaji:'resutoran', literal:'restaurant', script:'katakana', meaning:'restaurant', pos:'noun' },
+        TT_NI,
+        { base:'行きます', kana:'いきます', romaji:'ikimasu', literal:'go', script:'kanji', meaning:'go', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'寿司', kana:'すし', romaji:'sushi', literal:'sushi', script:'kanji', meaning:'sushi', pos:'noun',
+      example:{ gloss:'I like sushi.', tokens:[
+        { base:'寿司', kana:'すし', romaji:'sushi', literal:'sushi', script:'kanji', meaning:'sushi', pos:'noun' },
+        TT_GA,
+        { base:'好き', kana:'すき', romaji:'suki', literal:'liked', script:'kanji', meaning:'liked / favorite', pos:'adjective' },
+        TT_DESU, PUNCT_P
+      ]}},
+    { base:'ラーメン', kana:'', romaji:'raamen', literal:'ramen', script:'katakana', meaning:'ramen', pos:'noun',
+      example:{ gloss:'I’ll eat ramen.', tokens:[
+        { base:'ラーメン', kana:'', romaji:'raamen', literal:'ramen', script:'katakana', meaning:'ramen', pos:'noun' },
+        TT_O,
+        { base:'食べます', kana:'たべます', romaji:'tabemasu', literal:'eat', script:'kanji', meaning:'eat (polite)', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'メニュー', kana:'', romaji:'menyuu', literal:'menu', script:'katakana', meaning:'menu', pos:'noun',
+      example:{ gloss:'Menu, please.', tokens:[
+        { base:'メニュー', kana:'', romaji:'menyuu', literal:'menu', script:'katakana', meaning:'menu', pos:'noun' },
+        TT_O, TT_KUDASAI, PUNCT_P
+      ]}},
+    { base:'美味しい', kana:'おいしい', romaji:'oishii', literal:'delicious', script:'kanji', meaning:'delicious', pos:'adjective',
+      example:{ gloss:'It’s very delicious.', tokens:[
+        { base:'とても', kana:'', romaji:'totemo', literal:'very', script:'hiragana', meaning:'very', pos:'adverb' },
+        { base:'美味しい', kana:'おいしい', romaji:'oishii', literal:'delicious', script:'kanji', meaning:'delicious', pos:'adjective' },
+        TT_DESU, PUNCT_P
+      ]}},
+    { base:'お会計', kana:'おかいけい', romaji:'okaikei', literal:'bill', script:'kanji', meaning:'the bill / check', pos:'noun',
+      example:{ gloss:'The bill, please.', tokens:[
+        { base:'お会計', kana:'おかいけい', romaji:'okaikei', literal:'bill', script:'kanji', meaning:'the bill', pos:'noun' },
+        TT_O, TT_ONEGAI, PUNCT_P
+      ]}},
+    { base:'水', kana:'みず', romaji:'mizu', literal:'water', script:'kanji', meaning:'water', pos:'noun',
+      example:{ gloss:'Water please.', tokens:[
+        { base:'お水', kana:'おみず', romaji:'omizu', literal:'water', script:'kanji', meaning:'water (polite)', pos:'noun' },
+        TT_O, TT_KUDASAI, PUNCT_P
+      ]}},
+    { base:'ビール', kana:'', romaji:'biiru', literal:'beer', script:'katakana', meaning:'beer', pos:'noun',
+      example:{ gloss:'One beer, please.', tokens:[
+        { base:'ビール', kana:'', romaji:'biiru', literal:'beer', script:'katakana', meaning:'beer', pos:'noun' },
+        TT_O,
+        { base:'一つ', kana:'ひとつ', romaji:'hitotsu', literal:'one', script:'kanji', meaning:'one (counter)', pos:'noun' },
+        TT_KUDASAI, PUNCT_P
+      ]}}
+  ]},
+
+  { id:'hotel', emoji:'🏨', name:'Hotels', words:[
+    { base:'ホテル', kana:'', romaji:'hoteru', literal:'hotel', script:'katakana', meaning:'hotel', pos:'noun',
+      example:{ gloss:'I arrived at the hotel.', tokens:[
+        { base:'ホテル', kana:'', romaji:'hoteru', literal:'hotel', script:'katakana', meaning:'hotel', pos:'noun' },
+        TT_NI,
+        { base:'着きました', kana:'つきました', romaji:'tsukimashita', literal:'arrived', script:'kanji', meaning:'arrived (polite past)', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'部屋', kana:'へや', romaji:'heya', literal:'room', script:'kanji', meaning:'room', pos:'noun',
+      example:{ gloss:'What floor is the room on?', tokens:[
+        { base:'部屋', kana:'へや', romaji:'heya', literal:'room', script:'kanji', meaning:'room', pos:'noun' },
+        TT_WA,
+        { base:'何階', kana:'なんがい', romaji:'nangai', literal:'what-floor', script:'kanji', meaning:'what floor', pos:'noun' },
+        TT_DESU, TT_KA, PUNCT_Q
+      ]}},
+    { base:'鍵', kana:'かぎ', romaji:'kagi', literal:'key', script:'kanji', meaning:'key', pos:'noun',
+      example:{ gloss:'I lost the key.', tokens:[
+        { base:'鍵', kana:'かぎ', romaji:'kagi', literal:'key', script:'kanji', meaning:'key', pos:'noun' },
+        TT_O,
+        { base:'なくしました', kana:'', romaji:'nakushimashita', literal:'lost', script:'hiragana', meaning:'lost (polite past)', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'朝食', kana:'ちょうしょく', romaji:'choushoku', literal:'breakfast', script:'kanji', meaning:'breakfast', pos:'noun',
+      example:{ gloss:'What time is breakfast?', tokens:[
+        { base:'朝食', kana:'ちょうしょく', romaji:'choushoku', literal:'breakfast', script:'kanji', meaning:'breakfast', pos:'noun' },
+        TT_WA, TT_NANJI, TT_DESU, TT_KA, PUNCT_Q
+      ]}},
+    { base:'チェックイン', kana:'', romaji:'chekkuin', literal:'check-in', script:'katakana', meaning:'check-in (loanword)', pos:'noun',
+      example:{ gloss:'Check-in, please.', tokens:[
+        { base:'チェックイン', kana:'', romaji:'chekkuin', literal:'check-in', script:'katakana', meaning:'check-in', pos:'noun' },
+        TT_ONEGAI, PUNCT_P
+      ]}}
+  ]},
+
+  { id:'shopping', emoji:'🛍️', name:'Shopping', words:[
+    { base:'コンビニ', kana:'', romaji:'konbini', literal:'convenience-store', script:'katakana', meaning:'convenience store', pos:'noun',
+      example:{ gloss:'Where is a convenience store?', tokens:[
+        { base:'コンビニ', kana:'', romaji:'konbini', literal:'convenience-store', script:'katakana', meaning:'convenience store', pos:'noun' },
+        TT_WA, TT_DOKO, TT_DESU, TT_KA, PUNCT_Q
+      ]}},
+    { base:'お土産', kana:'おみやげ', romaji:'omiyage', literal:'souvenir', script:'kanji', meaning:'souvenir', pos:'noun',
+      example:{ gloss:'I’ll buy a souvenir.', tokens:[
+        { base:'お土産', kana:'おみやげ', romaji:'omiyage', literal:'souvenir', script:'kanji', meaning:'souvenir', pos:'noun' },
+        TT_O,
+        { base:'買います', kana:'かいます', romaji:'kaimasu', literal:'buy', script:'kanji', meaning:'buy', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'安い', kana:'やすい', romaji:'yasui', literal:'cheap', script:'kanji', meaning:'cheap / inexpensive', pos:'adjective',
+      example:{ gloss:'Is this cheap?', tokens:[
+        { base:'これ', kana:'', romaji:'kore', literal:'this', script:'hiragana', meaning:'this', pos:'pronoun' },
+        TT_WA,
+        { base:'安い', kana:'やすい', romaji:'yasui', literal:'cheap', script:'kanji', meaning:'cheap', pos:'adjective' },
+        TT_DESU, TT_KA, PUNCT_Q
+      ]}},
+    { base:'高い', kana:'たかい', romaji:'takai', literal:'expensive', script:'kanji', meaning:'expensive / tall', pos:'adjective',
+      example:{ gloss:'That’s expensive, isn’t it?', tokens:[
+        { base:'高い', kana:'たかい', romaji:'takai', literal:'expensive', script:'kanji', meaning:'expensive', pos:'adjective' },
+        TT_DESU,
+        { base:'ね', kana:'', romaji:'ne', literal:'right?', literalRole:'particle', script:'particle', meaning:'isn’t it?', pos:'particle' },
+        PUNCT_P
+      ]}},
+    { base:'これ', kana:'', romaji:'kore', literal:'this', script:'hiragana', meaning:'this (near speaker)', pos:'pronoun',
+      example:{ gloss:'I’ll take this.', tokens:[
+        { base:'これ', kana:'', romaji:'kore', literal:'this', script:'hiragana', meaning:'this', pos:'pronoun' },
+        TT_O, TT_KUDASAI, PUNCT_P
+      ]}}
+  ]},
+
+  { id:'money', emoji:'💴', name:'Money', words:[
+    { base:'円', kana:'えん', romaji:'en', literal:'yen', script:'kanji', meaning:'yen (currency)', pos:'noun',
+      example:{ gloss:'It’s 1000 yen.', tokens:[
+        { base:'千円', kana:'せんえん', romaji:'sen-en', literal:'1000-yen', script:'kanji', meaning:'1,000 yen', pos:'noun' },
+        TT_DESU, PUNCT_P
+      ]}},
+    { base:'お金', kana:'おかね', romaji:'okane', literal:'money', script:'kanji', meaning:'money', pos:'noun',
+      example:{ gloss:'I don’t have money.', tokens:[
+        { base:'お金', kana:'おかね', romaji:'okane', literal:'money', script:'kanji', meaning:'money', pos:'noun' },
+        TT_GA,
+        { base:'ありません', kana:'', romaji:'arimasen', literal:'don’t-have', script:'hiragana', meaning:'don’t have / there isn’t', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'クレジットカード', kana:'', romaji:'kurejittokaado', literal:'credit-card', script:'katakana', meaning:'credit card (loanword)', pos:'noun',
+      example:{ gloss:'By credit card, please.', tokens:[
+        { base:'クレジットカード', kana:'', romaji:'kurejittokaado', literal:'credit-card', script:'katakana', meaning:'credit card', pos:'noun' },
+        TT_DE, TT_ONEGAI, PUNCT_P
+      ]}}
+  ]},
+
+  { id:'directions', emoji:'🗺️', name:'Directions', words:[
+    { base:'右', kana:'みぎ', romaji:'migi', literal:'right', script:'kanji', meaning:'right (direction)', pos:'noun',
+      example:{ gloss:'Turn right.', tokens:[
+        { base:'右', kana:'みぎ', romaji:'migi', literal:'right', script:'kanji', meaning:'right', pos:'noun' },
+        TT_NI,
+        { base:'曲がります', kana:'まがります', romaji:'magarimasu', literal:'turn', script:'kanji', meaning:'turn (polite)', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'左', kana:'ひだり', romaji:'hidari', literal:'left', script:'kanji', meaning:'left (direction)', pos:'noun',
+      example:{ gloss:'It’s on the left.', tokens:[
+        { base:'左', kana:'ひだり', romaji:'hidari', literal:'left', script:'kanji', meaning:'left', pos:'noun' },
+        TT_NI,
+        { base:'あります', kana:'', romaji:'arimasu', literal:'exists', script:'hiragana', meaning:'there is', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'まっすぐ', kana:'', romaji:'massugu', literal:'straight', script:'hiragana', meaning:'straight ahead', pos:'adverb',
+      example:{ gloss:'Please go straight.', tokens:[
+        { base:'まっすぐ', kana:'', romaji:'massugu', literal:'straight', script:'hiragana', meaning:'straight', pos:'adverb' },
+        { base:'行って', kana:'いって', romaji:'itte', literal:'go-and', script:'kanji', meaning:'go (te-form)', pos:'verb' },
+        TT_KUDASAI, PUNCT_P
+      ]}},
+    { base:'ここ', kana:'', romaji:'koko', literal:'here', script:'hiragana', meaning:'here', pos:'pronoun',
+      example:{ gloss:'I get off here.', tokens:[
+        { base:'ここ', kana:'', romaji:'koko', literal:'here', script:'hiragana', meaning:'here', pos:'pronoun' },
+        TT_DE,
+        { base:'降ります', kana:'おります', romaji:'orimasu', literal:'get-off', script:'kanji', meaning:'get off (polite)', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'あそこ', kana:'', romaji:'asoko', literal:'over-there', script:'hiragana', meaning:'over there', pos:'pronoun',
+      example:{ gloss:'The station is over there.', tokens:[
+        { base:'駅', kana:'えき', romaji:'eki', literal:'station', script:'kanji', meaning:'station', pos:'noun' },
+        TT_WA,
+        { base:'あそこ', kana:'', romaji:'asoko', literal:'over-there', script:'hiragana', meaning:'over there', pos:'pronoun' },
+        TT_DESU, PUNCT_P
+      ]}}
+  ]},
+
+  { id:'emergency', emoji:'🆘', name:'Emergencies', words:[
+    { base:'助けて', kana:'たすけて', romaji:'tasukete', literal:'help', script:'kanji', meaning:'help! (te-form of tasukeru)', pos:'verb',
+      example:{ gloss:'Please help me!', tokens:[
+        { base:'助けて', kana:'たすけて', romaji:'tasukete', literal:'help', script:'kanji', meaning:'help', pos:'verb' },
+        TT_KUDASAI, PUNCT_EX
+      ]}},
+    { base:'病院', kana:'びょういん', romaji:'byouin', literal:'hospital', script:'kanji', meaning:'hospital', pos:'noun',
+      example:{ gloss:'Where is a hospital?', tokens:[
+        { base:'病院', kana:'びょういん', romaji:'byouin', literal:'hospital', script:'kanji', meaning:'hospital', pos:'noun' },
+        TT_WA, TT_DOKO, TT_DESU, TT_KA, PUNCT_Q
+      ]}},
+    { base:'警察', kana:'けいさつ', romaji:'keisatsu', literal:'police', script:'kanji', meaning:'police', pos:'noun',
+      example:{ gloss:'Please call the police.', tokens:[
+        { base:'警察', kana:'けいさつ', romaji:'keisatsu', literal:'police', script:'kanji', meaning:'police', pos:'noun' },
+        TT_O,
+        { base:'呼んで', kana:'よんで', romaji:'yonde', literal:'call', script:'kanji', meaning:'call (te-form)', pos:'verb' },
+        TT_KUDASAI, PUNCT_P
+      ]}},
+    { base:'大丈夫', kana:'だいじょうぶ', romaji:'daijoubu', literal:'all-right', script:'kanji', meaning:'all right / okay', pos:'adjective',
+      example:{ gloss:'I’m okay.', tokens:[
+        { base:'大丈夫', kana:'だいじょうぶ', romaji:'daijoubu', literal:'all-right', script:'kanji', meaning:'all right', pos:'adjective' },
+        TT_DESU, PUNCT_P
+      ]}}
+  ]},
+
+  { id:'time', emoji:'⏰', name:'Time', words:[
+    { base:'今', kana:'いま', romaji:'ima', literal:'now', script:'kanji', meaning:'now', pos:'noun',
+      example:{ gloss:'What time is it now?', tokens:[
+        { base:'今', kana:'いま', romaji:'ima', literal:'now', script:'kanji', meaning:'now', pos:'noun' },
+        PUNCT_C, TT_NANJI, TT_DESU, TT_KA, PUNCT_Q
+      ]}},
+    { base:'今日', kana:'きょう', romaji:'kyou', literal:'today', script:'kanji', meaning:'today', pos:'noun',
+      example:{ gloss:'Today is Monday.', tokens:[
+        { base:'今日', kana:'きょう', romaji:'kyou', literal:'today', script:'kanji', meaning:'today', pos:'noun' },
+        TT_WA,
+        { base:'月曜日', kana:'げつようび', romaji:'getsuyoubi', literal:'Monday', script:'kanji', meaning:'Monday', pos:'noun' },
+        TT_DESU, PUNCT_P
+      ]}},
+    { base:'明日', kana:'あした', romaji:'ashita', literal:'tomorrow', script:'kanji', meaning:'tomorrow', pos:'noun',
+      example:{ gloss:'I’ll come again tomorrow.', tokens:[
+        { base:'明日', kana:'あした', romaji:'ashita', literal:'tomorrow', script:'kanji', meaning:'tomorrow', pos:'noun' },
+        { base:'また', kana:'', romaji:'mata', literal:'again', script:'hiragana', meaning:'again', pos:'adverb' },
+        { base:'来ます', kana:'きます', romaji:'kimasu', literal:'come', script:'kanji', meaning:'come (polite)', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'何時', kana:'なんじ', romaji:'nanji', literal:'what-time', script:'kanji', meaning:'what time', pos:'noun',
+      example:{ gloss:'What time do we leave?', tokens:[
+        { base:'何時', kana:'なんじ', romaji:'nanji', literal:'what-time', script:'kanji', meaning:'what time', pos:'noun' },
+        TT_NI,
+        { base:'出発します', kana:'しゅっぱつします', romaji:'shuppatsushimasu', literal:'depart', script:'kanji', meaning:'depart (polite)', pos:'verb' },
+        TT_KA, PUNCT_Q
+      ]}},
+    { base:'分', kana:'ふん', romaji:'fun', literal:'minute', script:'kanji', meaning:'minute (counter)', pos:'noun',
+      example:{ gloss:'Please wait 5 minutes.', tokens:[
+        { base:'5分', kana:'ごふん', romaji:'gofun', literal:'5-minutes', script:'kanji', meaning:'5 minutes', pos:'noun' },
+        { base:'待って', kana:'まって', romaji:'matte', literal:'wait', script:'kanji', meaning:'wait (te-form)', pos:'verb' },
+        TT_KUDASAI, PUNCT_P
+      ]}}
+  ]},
+
+  { id:'greetings', emoji:'👋', name:'Greetings & Politeness', words:[
+    { base:'こんにちは', kana:'', romaji:'konnichiwa', literal:'hello', script:'hiragana', meaning:'hello (daytime greeting)', pos:'set phrase',
+      example:{ gloss:'Hello!', tokens:[
+        { base:'こんにちは', kana:'', romaji:'konnichiwa', literal:'hello', script:'hiragana', meaning:'hello', pos:'set phrase' },
+        PUNCT_EX
+      ]}},
+    { base:'ありがとう', kana:'', romaji:'arigatou', literal:'thank-you', script:'hiragana', meaning:'thank you (informal)', pos:'set phrase',
+      example:{ gloss:'Thank you really.', tokens:[
+        { base:'本当に', kana:'ほんとうに', romaji:'hontouni', literal:'really', script:'kanji', meaning:'really / truly', pos:'adverb' },
+        { base:'ありがとう', kana:'', romaji:'arigatou', literal:'thank-you', script:'hiragana', meaning:'thank you', pos:'set phrase' },
+        PUNCT_P
+      ]}},
+    { base:'すみません', kana:'', romaji:'sumimasen', literal:'excuse-me', script:'hiragana', meaning:'excuse me / sorry', pos:'set phrase',
+      example:{ gloss:'Excuse me, may I ask?', tokens:[
+        { base:'すみません', kana:'', romaji:'sumimasen', literal:'excuse-me', script:'hiragana', meaning:'excuse me', pos:'set phrase' },
+        PUNCT_C,
+        { base:'聞いても', kana:'きいても', romaji:'kiitemo', literal:'may-ask', script:'kanji', meaning:'even if (I) ask', pos:'verb' },
+        { base:'いいですか', kana:'', romaji:'iidesuka', literal:'is-okay?', script:'hiragana', meaning:'is it okay?', pos:'set phrase' },
+        PUNCT_Q
+      ]}},
+    { base:'はい', kana:'', romaji:'hai', literal:'yes', script:'hiragana', meaning:'yes', pos:'interjection',
+      example:{ gloss:'Yes, I understand.', tokens:[
+        { base:'はい', kana:'', romaji:'hai', literal:'yes', script:'hiragana', meaning:'yes', pos:'interjection' },
+        PUNCT_C,
+        { base:'わかりました', kana:'', romaji:'wakarimashita', literal:'understood', script:'hiragana', meaning:'understood (polite past)', pos:'verb' },
+        PUNCT_P
+      ]}},
+    { base:'いいえ', kana:'', romaji:'iie', literal:'no', script:'hiragana', meaning:'no', pos:'interjection',
+      example:{ gloss:'No, that’s all right.', tokens:[
+        { base:'いいえ', kana:'', romaji:'iie', literal:'no', script:'hiragana', meaning:'no', pos:'interjection' },
+        PUNCT_C,
+        { base:'結構', kana:'けっこう', romaji:'kekkou', literal:'fine', script:'kanji', meaning:'fine / no thanks', pos:'adjective' },
+        TT_DESU, PUNCT_P
+      ]}}
+  ]}
+];
 
 /* ============================================================
    KANA CHART DATA
@@ -2530,17 +3386,104 @@ function switchMode(mode) {
   document.getElementById('view-conversation').classList.toggle('active', mode === 'conversation');
   document.getElementById('view-kana').classList.toggle('active', mode === 'kana');
   document.getElementById('view-drill').classList.toggle('active', mode === 'drill');
+  document.getElementById('view-vocab').classList.toggle('active', mode === 'vocab');
   closeDetail();
   if (mode === 'conversation') renderScenarioCards();
   if (mode === 'kana') renderKanaChart();
   if (mode === 'drill' && !drillState.current) startDrill();
+  if (mode === 'vocab') renderVocab();
+}
+
+/* ============================================================
+   VOCAB RENDER
+   ============================================================ */
+function renderVocab() {
+  const list = document.getElementById('vocab-list');
+  if (list.dataset.rendered === '1') return;
+  const nav = document.getElementById('vocab-nav');
+  nav.innerHTML = '';
+  list.innerHTML = '';
+
+  VOCAB.forEach(cat => {
+    // Nav chip
+    const chip = document.createElement('a');
+    chip.href = '#vocab-' + cat.id;
+    chip.textContent = cat.emoji + ' ' + cat.name;
+    nav.appendChild(chip);
+
+    // Category section
+    const sec = document.createElement('div');
+    sec.className = 'vocab-category';
+    sec.id = 'vocab-' + cat.id;
+    const h3 = document.createElement('h3');
+    h3.innerHTML = '<span class="cat-emoji">' + cat.emoji + '</span> ' + cat.name;
+    sec.appendChild(h3);
+
+    cat.words.forEach(w => {
+      const card = document.createElement('div');
+      card.className = 'vocab-card';
+
+      // Word header row: word display + meta + play
+      const headerRow = document.createElement('div');
+      headerRow.className = 'vocab-word-row';
+
+      const display = document.createElement('div');
+      display.className = 'vocab-word-display';
+      display.appendChild(buildSentenceEl([w]));
+      headerRow.appendChild(display);
+
+      const meta = document.createElement('div');
+      meta.className = 'vocab-word-meta';
+      meta.innerHTML =
+        '<div class="meaning">' + w.meaning + '</div>' +
+        '<div class="pos">' + w.pos + '</div>';
+      headerRow.appendChild(meta);
+
+      const playBtn = document.createElement('button');
+      playBtn.className = 'vocab-word-play';
+      playBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> hear';
+      playBtn.addEventListener('click', () => speak(w.base));
+      headerRow.appendChild(playBtn);
+
+      card.appendChild(headerRow);
+
+      // Example
+      if (w.example) {
+        const ex = document.createElement('div');
+        ex.className = 'vocab-example';
+        const label = document.createElement('div');
+        label.className = 'vocab-example-label';
+        const lbl = document.createElement('span');
+        lbl.textContent = 'Example';
+        label.appendChild(lbl);
+        const exPlay = document.createElement('button');
+        exPlay.className = 'vocab-example-play';
+        exPlay.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> hear sentence';
+        exPlay.addEventListener('click', () => speak(tokensToText(w.example.tokens)));
+        label.appendChild(exPlay);
+        ex.appendChild(label);
+        ex.appendChild(buildSentenceEl(w.example.tokens));
+        const gloss = document.createElement('div');
+        gloss.className = 'gloss';
+        gloss.textContent = w.example.gloss;
+        ex.appendChild(gloss);
+        card.appendChild(ex);
+      }
+
+      sec.appendChild(card);
+    });
+
+    list.appendChild(sec);
+  });
+
+  list.dataset.rendered = '1';
 }
 
 /* ============================================================
    DRILL MODE
    ============================================================ */
 const drillState = {
-  settings: { script:'hiragana', level:'basic' },
+  settings: { script:'hiragana', level:'basic', mode:'multiple' },
   pool: [],
   recent: [],
   misses: {},
@@ -2550,6 +3493,23 @@ const drillState = {
   bestStreak: 0,
   locked: false
 };
+
+// Common romaji alternates we accept (Hepburn primary, others tolerated)
+const ROMAJI_ALIASES = {
+  'shi': ['si'], 'chi': ['ti'], 'tsu': ['tu'], 'fu': ['hu'],
+  'ji':  ['zi','dji','dzi'], 'zu': ['du'],
+  'sha': ['sya'], 'shu': ['syu'], 'sho': ['syo'],
+  'cha': ['tya'], 'chu': ['tyu'], 'cho': ['tyo'],
+  'ja':  ['zya','jya'], 'ju': ['zyu','jyu'], 'jo': ['zyo','jyo'],
+  'wo': ['o']
+};
+function isRomajiCorrect(guess, answer) {
+  guess = (guess || '').trim().toLowerCase();
+  answer = answer.toLowerCase();
+  if (guess === answer) return true;
+  const aliases = ROMAJI_ALIASES[answer];
+  return !!(aliases && aliases.includes(guess));
+}
 
 function buildDrillPool() {
   const { script, level } = drillState.settings;
@@ -2609,18 +3569,77 @@ function renderDrillCard() {
   const cardEl = document.getElementById('drill-card');
   cardEl.className = 'drill-card ' + card.script;
   cardEl.textContent = card.display;
+  drillState.locked = false;
 
+  const choicesWrap = document.getElementById('drill-choices');
+  const inputWrap = document.getElementById('drill-input-wrap');
+  const input = document.getElementById('drill-input');
+  const submit = document.getElementById('drill-submit');
+
+  if (drillState.settings.mode === 'type') {
+    choicesWrap.style.display = 'none';
+    inputWrap.style.display = 'flex';
+    input.value = '';
+    input.disabled = false;
+    input.classList.remove('correct', 'wrong');
+    submit.disabled = false;
+    setTimeout(() => input.focus(), 30);
+    return;
+  }
+
+  // Multiple choice mode
+  inputWrap.style.display = 'none';
+  choicesWrap.style.display = 'grid';
+  choicesWrap.innerHTML = '';
   const choices = [card.romaji, ...pickDistractors(card)].sort(() => Math.random() - 0.5);
-  const wrap = document.getElementById('drill-choices');
-  wrap.innerHTML = '';
   choices.forEach(romaji => {
     const b = document.createElement('button');
     b.className = 'drill-choice';
     b.textContent = romaji;
     b.addEventListener('click', () => answerDrill(romaji, b));
-    wrap.appendChild(b);
+    choicesWrap.appendChild(b);
   });
-  drillState.locked = false;
+}
+
+function submitTypedAnswer() {
+  if (drillState.locked) return;
+  const input = document.getElementById('drill-input');
+  const guess = (input.value || '').trim().toLowerCase();
+  if (!guess) return;
+  drillState.locked = true;
+
+  const card = drillState.current;
+  const correct = isRomajiCorrect(guess, card.romaji);
+  drillState.score.total++;
+  const cardEl = document.getElementById('drill-card');
+
+  if (correct) {
+    drillState.score.correct++;
+    drillState.streak++;
+    if (drillState.streak > drillState.bestStreak) drillState.bestStreak = drillState.streak;
+    input.classList.add('correct');
+    cardEl.classList.add('flash-correct');
+  } else {
+    drillState.streak = 0;
+    const key = card.display + '|' + card.script;
+    drillState.misses[key] = (drillState.misses[key] || 0) + 1;
+    input.classList.add('wrong');
+    input.value = guess + '   →   ' + card.romaji;
+    cardEl.classList.add('flash-wrong');
+  }
+  input.disabled = true;
+  document.getElementById('drill-submit').disabled = true;
+  speak(card.display);
+  updateDrillStats();
+
+  setTimeout(() => {
+    cardEl.classList.remove('flash-correct', 'flash-wrong');
+    drillState.recent.push(card.display + '|' + card.script);
+    if (drillState.recent.length > 6) drillState.recent.shift();
+    drillState.current = pickNextCard();
+    renderDrillCard();
+    renderDrillRecap();
+  }, correct ? 600 : 1700);
 }
 
 function answerDrill(picked, btn) {
@@ -2869,6 +3888,20 @@ function init() {
     closeDetail();
   });
 
+  // 🎲 Surprise me — pick a random article different from the current one
+  document.getElementById('article-random').addEventListener('click', () => {
+    const others = ARTICLES.filter(a => a.id !== (currentArticle && currentArticle.id));
+    const pick = others[Math.floor(Math.random() * others.length)];
+    currentArticle = pick;
+    sel.value = pick.id;
+    renderArticle(pick);
+    closeDetail();
+  });
+
+  // Pick a random article on initial load
+  currentArticle = ARTICLES[Math.floor(Math.random() * ARTICLES.length)];
+  sel.value = currentArticle.id;
+
   // Play all
   document.getElementById('play-all').addEventListener('click', () => {
     speak(articleText(currentArticle));
@@ -2908,6 +3941,10 @@ function init() {
     });
   });
   document.getElementById('drill-restart').addEventListener('click', startDrill);
+  document.getElementById('drill-submit').addEventListener('click', submitTypedAnswer);
+  document.getElementById('drill-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') submitTypedAnswer();
+  });
 
   // Detail close
   document.getElementById('detail-close').addEventListener('click', closeDetail);
