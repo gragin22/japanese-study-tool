@@ -566,7 +566,14 @@
     padding: 4px;
     margin: 0 auto 20px;
     width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
   }
+  .mode-toggle::-webkit-scrollbar { display: none; }
   .mode-toggle button {
     background: none;
     border: none;
@@ -577,6 +584,8 @@
     color: var(--ink-soft);
     cursor: pointer;
     font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .mode-toggle button.active {
     background: var(--surface);
